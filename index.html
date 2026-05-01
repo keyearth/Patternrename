@@ -1,0 +1,1752 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary SEO -->
+    <title>PatternRename — Batch File Renaming Tool | Multi-Pattern, RegExp &amp; Position-Based</title>
+	<p>Work best in PC</P>
+    <meta name="description" content="PatternRename is a free browser-based batch file renaming tool. Rename images, videos, documents and more using smart patterns, regular expressions, alphanumeric sequences, and character-position extraction — no installation required.">
+    <meta name="keywords" content="batch file rename, bulk rename, file renaming tool, pattern rename, regex rename, image rename, browser file tool, no install rename, multi-pattern rename">
+    <meta name="author" content="PatternRename">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://patternrename.app/">
+
+    <!-- Open Graph (Facebook / LinkedIn) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PatternRename — Batch File Renaming Tool">
+    <meta property="og:description" content="Rename files in bulk right in your browser. Supports smart-fill patterns, RegExp, alphanumeric sequences and character-position extraction. Free, fast, no install.">
+    <meta property="og:url" content="https://patternrename.app/">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="PatternRename — Batch File Renaming Tool">
+    <meta name="twitter:description" content="Free browser-based batch renaming: patterns, RegExp, sequences. No install required.">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "PatternRename",
+      "description": "A free browser-based batch file renaming tool supporting multi-pattern, regular expressions, alphanumeric sequences, and character-position extraction.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "url": "https://patternrename.app/"
+    }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f0f2f5; }
+
+        .container { max-width: 100%; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 20px; }
+
+        .toolbar { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ddd; align-items: center; justify-content: center; }
+
+        button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; transition: 0.2s; font-size: 13px; }
+
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-primary   { background: #007bff; color: white; }
+        .btn-success   { background: #28a745; color: white; }
+        .btn-danger    { background: #dc3545; color: white; }
+        .btn-warning   { background: #ffc107; color: #212529; }
+        .btn-reset     { background: #0011bb; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+
+        /* Small in-table buttons (Show, ⚡, X) share one class */
+        .btn-intable { padding: 2px 7px; font-size: 11px; font-weight: 500; border: none; border-radius: 3px; cursor: pointer; color: white; transition: 0.2s; }
+
+        .table-wrapper { overflow: auto; border: 1px solid #ccc; max-height: 70vh; }
+
+        table { border-collapse: collapse; width: 100%; table-layout: auto; user-select: none; }
+
+        th, td { border: 1px solid #ddd; padding: 0; min-width: 150px; height: 35px; position: relative; text-align: center; }
+
+        th { background: #f8f9fa; font-size: 11px; position: sticky; top: 0; z-index: 10; padding: 8px; color: #555; }
+
+        input { width: 100%; height: 100%; border: none; padding: 0 8px; outline: none; background: transparent; font-size: 14px; user-select: text; }
+
+        input:focus { background: #fff; box-shadow: inset 0 0 0 2px #007bff; z-index: 2; }
+
+        input:disabled { background: #e9ecef; color: #aaa; cursor: not-allowed; }
+
+        .computed      { background: #f9f9f9; font-weight: bold; color: #007bff; pointer-events: none; }
+        .filename-input { background: #f1f3f4; color: #555; cursor: default; }
+        .selected-cell  { background-color: rgba(0, 123, 255, 0.2) !important; outline: 1px solid #007bff; }
+        .range-origin   { background-color: rgba(0, 123, 255, 0.35) !important; outline: 2px solid #007bff; }
+        .copy-flash     { animation: flashCopy 0.4s ease; }
+        @keyframes flashCopy { 0%{background:#b3ffb3}100%{background:transparent} }
+
+        .thumb-img { width: 100px; height: auto; display: block; margin: 2px auto; border-radius: 2px; }
+
+        td:first-child { background-color: #f9f9f9; font-weight: bold; }
+
+
+
+        .thumb-img {
+            width: auto;
+            height: 40px;
+            display: none;
+            transition: transform 0.2s;
+            cursor: zoom-in;
+            margin: 5px auto;
+        }
+
+        .thumb-img:hover {
+            transform: scale(4);
+            position: relative;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        #statusBar {
+            margin-top: 10px;
+            padding: 6px 12px;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #3730a3;
+        }
+
+        /* ── App name branding ── */
+        .app-name {
+            display: flex; flex-direction: column; align-items: flex-start;
+            margin-right: 16px;
+        }
+        .app-name-main {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #0C3252 0%, #00BAD2 60%, #0C3252 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; line-height: 1.1;
+        }
+        .app-name-sub {
+            font-size: 12px; font-weight: 600; letter-spacing: 3px;
+            color: #aaa; margin-top: 3px; 
+        }
+        .app-name-sub span {
+            color: red;
+        }
+
+        /* ── Extension filter dropdown ── */
+        .ext-filter-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ext-filter-label {
+            font-size: 12px;
+            color: #555;
+            white-space: nowrap;
+        }
+        #extFilterBtn {
+            padding: 5px 10px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            min-width: 130px;
+            text-align: left;
+        }
+        #extFilterBtn:hover { border-color: #007bff; }
+        #extDropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 999;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 8px;
+            min-width: 220px;
+        }
+        #extDropdown.open { display: block; }
+        .ext-group-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 6px 0 3px 2px;
+        }
+ .ext-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;  /* pushes children to opposite ends */
+    padding: 3px 4px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+        .ext-option:hover { background: #f0f4ff; }
+        .ext-option input[type=checkbox] { cursor: pointer; }
+        .ext-option-all {
+            background: #f8f9ff;
+            border-radius: 4px;
+            padding: 5px 6px;
+            border: 1px solid #e0e7ff;
+            margin-bottom: 2px;
+        }
+        .ext-option-all:hover { background: #eef2ff; }
+        .ext-dropdown-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            border-top: 1px solid #eee;
+            padding-top: 6px;
+        }
+        .ext-dropdown-actions button {
+            flex: 1;
+            font-size: 11px;
+            padding: 3px 0;
+            background: #f0f4ff;
+            color: #3730a3;
+            border: 1px solid #c7d2fe;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="toolbar">
+
+            <!-- ── Branding ── -->
+            <div class="app-name">
+                <div class="app-name-main">PatternRename</div>
+                <div class="app-name-sub"><span>Multi-Pattern</span> · <span>RegExp</span> · <span>Pos[i,j]</span> · <span>Preview</span></div>
+            </div>
+
+            <!-- ── File-extension filter (BEFORE Load button) ── -->
+            <div class="ext-filter-wrap" id="extFilterWrap">
+                <span class="ext-filter-label">File type:</span>
+                <button id="extFilterBtn" onclick="toggleExtDropdown(event)" title="Choose which file extensions to load">🗂 Images ▾</button>
+                <div id="extDropdown">
+                    <!-- *.* wildcard row -->
+                    <label class="ext-option ext-option-all">
+                        <input type="checkbox" value="*" id="extAll" onchange="onAllFilesToggle(this)">
+                        <strong>*.* &nbsp;All file types</strong>
+                    </label>
+                    <hr style="margin:4px 0; border-color:#eee;">
+                    <div class="ext-group-label">Images</div>
+                    <label class="ext-option"><input type="checkbox" value="jpg"  checked> .jpg / .jpeg</label>
+                    <label class="ext-option"><input type="checkbox" value="jpeg" checked style="display:none"></label>
+                    <label class="ext-option"><input type="checkbox" value="png"  checked> .png</label>
+                    <label class="ext-option"><input type="checkbox" value="gif"  checked> .gif</label>
+                    <label class="ext-option"><input type="checkbox" value="webp" checked> .webp</label>
+                    <label class="ext-option"><input type="checkbox" value="svg"  checked> .svg</label>
+                    <label class="ext-option"><input type="checkbox" value="bmp"  checked> .bmp</label>
+                    <label class="ext-option"><input type="checkbox" value="tiff" checked> .tiff / .tif</label>
+                    <label class="ext-option"><input type="checkbox" value="tif"  checked style="display:none"></label>
+                    <label class="ext-option"><input type="checkbox" value="heic" checked> .heic</label>
+                    <div class="ext-group-label">Video</div>
+                    <label class="ext-option"><input type="checkbox" value="mp4"> .mp4</label>
+                    <label class="ext-option"><input type="checkbox" value="mov"> .mov</label>
+                    <label class="ext-option"><input type="checkbox" value="avi"> .avi</label>
+                    <label class="ext-option"><input type="checkbox" value="mkv"> .mkv</label>
+                    <label class="ext-option"><input type="checkbox" value="wmv"> .wmv</label>
+                    <div class="ext-group-label">Audio</div>
+                    <label class="ext-option"><input type="checkbox" value="mp3"> .mp3</label>
+                    <label class="ext-option"><input type="checkbox" value="wav"> .wav</label>
+                    <label class="ext-option"><input type="checkbox" value="flac"> .flac</label>
+                    <label class="ext-option"><input type="checkbox" value="aac"> .aac</label>
+                    <div class="ext-group-label">Documents</div>
+                    <label class="ext-option"><input type="checkbox" value="pdf"> .pdf</label>
+                    <label class="ext-option"><input type="checkbox" value="docx"> .docx</label>
+                    <label class="ext-option"><input type="checkbox" value="xlsx"> .xlsx</label>
+                    <label class="ext-option"><input type="checkbox" value="pptx"> .pptx</label>
+                    <label class="ext-option"><input type="checkbox" value="txt"> .txt</label>
+                    <div class="ext-group-label">Other</div>
+                    <label class="ext-option"><input type="checkbox" value="zip"> .zip</label>
+                    <label class="ext-option"><input type="checkbox" value="rar"> .rar</label>
+                    <label class="ext-option"><input type="checkbox" value="json"> .json</label>
+                    <label class="ext-option"><input type="checkbox" value="xml"> .xml</label>
+                    <label class="ext-option"><input type="checkbox" value="csv"> .csv</label>
+                    <div class="ext-dropdown-actions">
+                        <button onclick="setAllExt(true)">All</button>
+                        <button onclick="setAllExt(false)">None</button>
+                        <button onclick="applyExtFilter()">✓ Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Action buttons ── -->
+            <button id="btnLoadReset"    class="btn-reset"   onclick="handleMainButton(); zaraz.track('button_click', { button: 'LoadReset' })">▶ Load &amp; Reset</button>
+            <button id="btnForgetFolder" class="btn-danger"  onclick="forgetFolder(); zaraz.track('button_click', { button: 'Changefolder' })" style="display:none;" title="Clear the saved folder so the next click picks a new one">✕ Change Folder</button>
+            <button id="btnInsertRow"    class="btn-success" onclick="insertRowBtn(); zaraz.track('button_click', { button: 'Addrow' })">+ Insert Row</button>
+            <button id="btnAddColumn"    class="btn-primary" onclick="addColumn(); zaraz.track('button_click', { button: 'Addcol' })">+ Add Column</button>
+            <button id="btnDeleteRow"    class="btn-danger"  onclick="deleteRowHandler(); zaraz.track('button_click', { button: 'Delrow' })">✕ Delete Row</button>
+            <button id="btnSmartFill"    class="btn-success" onclick="smartFillAll(); zaraz.track('button_click', { button: 'Smartfill' })">⚡ Smart Fill All</button>
+            <button id="btnRenameAll"    class="btn-warning" onclick="renameAllFiles(); zaraz.track('button_click', { button: 'Rename' })">✎ Rename All Files</button>
+
+            <button class="btn-secondary" style="margin-left:auto;"><a href="help.html" onclick="zaraz.track('button_click', { button: 'help' })" style="color:white;text-decoration:none;">? Help</a></button>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="dataTable">
+                <thead>
+                    <tr id="headerRow">
+                        <th id="No" width="6">No</th>
+                        <th id="firstHeader">Original Filename</th>
+                        <th id="timeHeader" width="120px">Time [Diff]</th>
+                        <th id="imgHeader" width="60px">Img
+                            <button id="btnShowAll"
+                                    class="btn-intable btn-success"
+                                    onclick="displayAllImages()">Show all</button>
+                        </th>
+                        <th id="computedHeader">New Filename Preview</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div id="statusBar"></div>
+
+<div id="showhint"  style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:5px 12px; background:#eef2ff; border:1px solid #c7d2fe; border-radius:6px; font-size:13px; color:#3730a3; font-weight:600; user-select:none;">
+  <span id="showhint-arrow" style="transition:transform 0.2s;">▼</span> Quick-start examples 
+</div>
+<br>
+
+<div id="tips" style="margin-top:8px; overflow:hidden; max-height:1000px; transition:max-height 0.35s ease;">
+
+  <p style="font-size:13px; color:#555; margin-bottom:8px;">
+    Example filename: <strong>USA_PET_PUPPY_2026_A.jpg</strong> &nbsp;·&nbsp;
+    Positions are 1-based characters of the original filename (excluding extension).
+  </p>
+
+  <div style="overflow-x:auto;">
+  <table style="border-collapse:collapse; font-size:12px; width:90%; min-width:700px;">
+    <thead>
+      <tr style="background:#3730a3; color:white;">
+        <th style="padding:7px 10px; border:1px solid #4f46e5; text-align:left;">Feature</th>
+        <th style="padding:7px 10px; border:1px solid #4f46e5;">Prefill&nbsp;(you type)</th>
+        <th style="padding:7px 10px; border:1px solid #4f46e5;">Auto-fill&nbsp;(next rows)</th>
+        <th style="padding:7px 10px; border:1px solid #4f46e5;">Result in Preview</th>
+        <th style="padding:7px 10px; border:1px solid #4f46e5; text-align:left;">Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:#f8f9fa;">
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Simple letter sequence</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">X, Y</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">Z, A, B …</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">…_X, …_Y, …_Z</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Wraps A→Z continuously</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Alphanumeric with leading zero</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">A3B05, A3B07</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">A3B09, A3B11 …</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">USA_A3B05.jpg …</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Numeric part increments; leading zero preserved when present</td>
+      </tr>
+      <tr style="background:#f8f9fa;">
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Repeating pair pattern</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">A, A, C, C</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">E, E, G, G …</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">…_A, …_A, …_C, …_C</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Write the repeat block twice so Smart Fill skips ahead correctly</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Fixed-suffix repeat pattern</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">DOF, DOK</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">DOF, DOK …</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">…_DOF, …_DOK</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Alternates indefinitely; tip — include the suffix (e.g. <code>5_, 6_, 7_</code>) to lock it</td>
+      </tr>
+      <tr style="background:#f8f9fa;">
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Position list (char extract)</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">[5,6,7,3-1]</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;"><em>same for all rows</em></td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">PETASU</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Chars at pos 5,6,7 = <strong>PET</strong>; pos 3 down to 1 = <strong>ASU</strong> (from <em>USA_PET_PUPPY_2026_A</em>)</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">RegExp extract</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">/\d+/</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;"><em>same for all rows</em></td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">2026</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Extracts the first run of digits — yields <strong>2026</strong> from the filename</td>
+      </tr>
+      <tr style="background:#f8f9fa;">
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Pos: full name slice</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">[1-50]</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;"><em>same for all rows</em></td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">USA_PET_PUPPY_2026_A</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Advance mode: grabs chars 1–50 of the original name (without extension)</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Move to new subfolder</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">USA_PET_PUPPY_2026_A/</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;"><em>combine with other cols</em></td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">USA_PET_PUPPY_2026_A/<br>…renamed….jpg</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Trailing <code>/</code> creates a subfolder named after the value and moves the file into it</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p style="font-size:12px; color:#888; margin-top:8px;">
+    💡 <a href="help.html" onclick="zaraz.track('button_click', { button: 'help' })" style="color:#3730a3;">Full help page ↗</a>
+  </p>
+
+</div>
+
+
+
+    </div><script>
+
+function toggleTips() {
+    const tips  = document.getElementById("tips");
+    const arrow = document.getElementById("showhint-arrow");
+    const open  = tips.style.maxHeight === "0px";
+    tips.style.maxHeight = open ? "1000px" : "0px";
+    if (arrow) arrow.style.transform = open ? "rotate(90deg)" : "";
+}
+
+        /* ═══════════════════════════════════════════════
+           Extension filter helpers
+        ═══════════════════════════════════════════════ */
+
+        function getSelectedExtensions() {
+            // If *.* is checked, return null → means accept everything
+            if (document.getElementById('extAll') && document.getElementById('extAll').checked) {
+                return null;
+            }
+            return Array.from(document.querySelectorAll('#extDropdown input[type=checkbox]:checked'))
+                .filter(cb => cb.value !== '*')
+                .map(cb => cb.value.toLowerCase());
+        }
+
+        function onAllFilesToggle(cb) {
+            // When *.* is checked, uncheck all individual boxes; when unchecked, recheck images
+            const individual = document.querySelectorAll('#extDropdown input[type=checkbox]:not(#extAll)');
+            if (cb.checked) {
+                individual.forEach(c => c.checked = false);
+            } else {
+                // Restore default image selection
+                ['jpg','jpeg','png','gif','webp','svg','bmp','tiff','tif','heic'].forEach(ext => {
+                    const el = document.querySelector(`#extDropdown input[value="${ext}"]`);
+                    if (el) el.checked = true;
+                });
+            }
+        }
+
+        function toggleExtDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('extDropdown').classList.toggle('open');
+        }
+
+        function setAllExt(checked) {
+            document.getElementById('extAll').checked = false; // always clear *.* first
+            document.querySelectorAll('#extDropdown input[type=checkbox]:not(#extAll)').forEach(cb => cb.checked = checked);
+        }
+
+        function applyExtFilter() {
+            const allFiles = document.getElementById('extAll').checked;
+            let label;
+            if (allFiles) {
+                label = '*.* All types';
+            } else {
+                const exts = getSelectedExtensions() || [];
+                label = exts.length === 0 ? 'No types'
+                      : exts.length <= 4   ? exts.map(e => '.'+e).join(', ')
+                      : `${exts.length} types`;
+            }
+            document.getElementById('extFilterBtn').textContent = `🗂 ${label} ▾`;
+            document.getElementById('extDropdown').classList.remove('open');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const wrap = document.getElementById('extFilterWrap');
+            if (wrap && !wrap.contains(e.target)) {
+                document.getElementById('extDropdown').classList.remove('open');
+            }
+        });
+
+
+        /* ═══════════════════════════════════════════════
+           State variables
+        ═══════════════════════════════════════════════ */
+
+        let colCounter       = 0;
+        let loadedFilenames  = [];
+        let loadedFileTimes  = []; // Stores file timestamps
+        let selectedCells    = [];
+        let directoryHandle  = null;
+
+        const tableBody = document.querySelector('#dataTable tbody');
+
+
+        /* ═══════════════════════════════════════════════
+           IndexedDB — persist & restore directory handle
+           DB: "BatchRenamerDB"  store: "handles"  key: "lastFolder"
+        ═══════════════════════════════════════════════ */
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('BatchRenamerDB', 1);
+                req.onupgradeneeded = e => e.target.result.createObjectStore('handles');
+                req.onsuccess       = e => resolve(e.target.result);
+                req.onerror         = e => reject(e.target.error);
+            });
+        }
+
+        async function saveHandleToDB(handle) {
+            try {
+                const db  = await openDB();
+                const tx  = db.transaction('handles', 'readwrite');
+                tx.objectStore('handles').put(handle, 'lastFolder');
+                await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
+            } catch(e) { console.warn('Could not save handle to IndexedDB:', e); }
+        }
+
+        async function loadHandleFromDB() {
+            try {
+                const db  = await openDB();
+                const tx  = db.transaction('handles', 'readonly');
+                return await new Promise((res, rej) => {
+                    const req = tx.objectStore('handles').get('lastFolder');
+                    req.onsuccess = () => res(req.result || null);
+                    req.onerror   = () => rej(req.error);
+                });
+            } catch(e) { return null; }
+        }
+
+        async function initMainButton() {
+            const handle = await loadHandleFromDB();
+            const btn = document.getElementById('btnLoadReset');
+            const forgetBtn = document.getElementById('btnForgetFolder');
+            if (handle) {
+                btn.innerHTML = `📂 Refresh: "${handle.name}"`;
+                btn.title = 'Click to reopen the last used folder. Shift+click to pick a new folder instead.';
+                if (forgetBtn) forgetBtn.style.display = 'inline-block';
+            } else {
+                btn.innerHTML = '&#9654; Load &amp; Reset';
+                btn.title = '';
+                if (forgetBtn) forgetBtn.style.display = 'none';
+            }
+        }
+
+        async function forgetFolder() {
+            const ok = confirm('Clear the saved folder?\nThe next click on the main button will open the folder picker.');
+            if (!ok) return;
+            try {
+                const db = await openDB();
+                const tx = db.transaction('handles', 'readwrite');
+                tx.objectStore('handles').delete('lastFolder');
+                await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
+            } catch(e) { console.warn('Could not clear handle:', e); }
+            directoryHandle = null;
+            const btn = document.getElementById('btnLoadReset');
+            btn.innerHTML = '&#9654; Load &amp; Reset';
+            btn.title = '';
+            const forgetBtn = document.getElementById('btnForgetFolder');
+            if (forgetBtn) forgetBtn.style.display = 'none';
+            setStatus('Saved folder cleared — click Load & Reset to pick a new folder.');
+        }
+
+        /** Single entry point for the combined button */
+        async function handleMainButton() {
+            const handle = await loadHandleFromDB();
+            if (handle && !event.shiftKey) {
+                await reopenLastFolder();
+            } else {
+                await ResetRefresh();
+            }
+        }
+
+        async function reopenLastFolder() {
+            const handle = await loadHandleFromDB();
+            if (!handle) { setStatus('No saved folder found. Use Load & Reset to pick one.'); return; }
+            try {
+                const perm = await handle.requestPermission({ mode: 'readwrite' });
+                if (perm !== 'granted') { setStatus('Permission denied for saved folder.'); return; }
+                directoryHandle = handle;
+                // Reset editable cell values then reload
+                for (let row of tableBody.rows) {
+                    row.querySelectorAll('input').forEach(i => {
+                        if (!i.classList.contains('filename-input') && !i.classList.contains('computed'))
+                            i.value = '';
+                    });
+                    updateRowPreview(row);
+                }
+                await refreshFolder();
+            } catch(e) {
+                setStatus('Could not reopen saved folder — it may have been moved or deleted.');
+                console.error(e);
+            }
+        }
+
+        function warnNoImages(folderName) {
+            const msg = `⚠ No images found in "${folderName}".\nPlease select a different folder that contains JPG, PNG, or SVG files.`;
+            alert(msg);
+            setStatus(`⚠ No images found in "${folderName}" — please reselect a folder with images.`);
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           UI enable / disable helpers
+        ═══════════════════════════════════════════════ */
+
+        function setControlsEnabled(enabled) {
+            // All toolbar buttons except Load & Reset
+            const toolbarBtns = ['btnInsertRow', 'btnAddColumn', 'btnDeleteRow',
+                                  'btnSmartFill', 'btnRenameAll', 'btnShowAll'];
+            toolbarBtns.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.disabled = !enabled;
+            });
+
+            // All regular inputs in the table body
+            tableBody.querySelectorAll('input').forEach(inp => {
+                if (!inp.classList.contains('computed') && !inp.classList.contains('filename-input')) {
+                    inp.disabled = !enabled;
+                }
+            });
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Status bar helper
+        ═══════════════════════════════════════════════ */
+
+        function setStatus(msg) {
+            const bar = document.getElementById('statusBar');
+            if (bar) bar.textContent = msg;
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Keyboard navigation
+        ═══════════════════════════════════════════════ */
+
+        function moveFocusDown(currentInput) {
+            const currentTd  = currentInput.parentElement;
+            const currentRow = currentTd.parentElement;
+            const nextRow    = currentRow.nextElementSibling;
+
+            if (nextRow) {
+                const colIndex  = currentTd.cellIndex;
+                const nextInput = nextRow.cells[colIndex].querySelector('input');
+                if (nextInput && !nextInput.readOnly) {
+                    nextInput.focus();
+                }
+            }
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Row / filename refresh
+        ═══════════════════════════════════════════════ */
+
+        function refreshFilenames() {
+            const rows = tableBody.rows;
+            let prevTime = null;
+
+            for (let i = 0; i < rows.length; i++) {
+                const fname = loadedFilenames[i] || "";
+                const ftime = loadedFileTimes[i] || null;
+
+                // cells[1] = Original Filename column
+                const fileInput = rows[i].cells[1].querySelector('input');
+                if (fileInput) fileInput.value = fname;
+
+                // cells[2] = Time [Diff] column
+                const timeCell = rows[i].cells[2];
+                if (timeCell) {
+                    const timeInput = timeCell.querySelector('input');
+                    if (timeInput) {
+                        if (fname && ftime) {
+                            const d = new Date(ftime);
+                            const hh = String(d.getHours()).padStart(2, '0');
+                            const mm = String(d.getMinutes()).padStart(2, '0');
+                            const ss = String(d.getSeconds()).padStart(2, '0');
+                            
+                            let diffStr = "[0s]";
+                            if (prevTime !== null) {
+                                const diffSec = Math.round((ftime - prevTime) / 1000);
+                                diffStr = `[${diffSec}s]`;
+                            }
+                            timeInput.value = `${hh}:${mm}:${ss} ${diffStr}`;
+                            prevTime = ftime;
+                        } else {
+                            timeInput.value = "";
+                            prevTime = null;
+                        }
+                    }
+                }
+
+                // cells[3] = Img column
+                const imgCell = rows[i].cells[3];
+                if (imgCell) {
+                    const btn = imgCell.querySelector('.btn-intable');
+                    const img = imgCell.querySelector('img');
+                    if (btn) btn.style.display = fname ? "inline-block" : "none";
+                    if (img) { img.style.display = "none"; img.src = ""; }
+                }
+
+                updateRowPreview(rows[i]);
+            }
+            cleanupEmptyRows();
+        }
+
+        function refreshNo() {
+            const rows = tableBody.rows;
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].cells[0].textContent = i + 1;
+            }
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Display all images
+        ═══════════════════════════════════════════════ */
+
+        function displayAllImages() {
+            if (!directoryHandle) {
+                alert("Please click Load & Reset button to select image first!");
+                return;
+            }
+            const ok = confirm("Warning:\n Displaying all images may consume significant memory and slow down the system. Continue??");
+            if (!ok) return;
+
+            document.querySelectorAll('.btn-intable.btn-secondary').forEach(btn => {
+                if (btn.style.display !== 'none') {
+                    btn.click();
+                }
+            });
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Insert / delete row
+        ═══════════════════════════════════════════════ */
+
+        // Returns array of editable inputs in a row (col1, col2 … — not filename/computed/No)
+        function getEditableInputs(row) {
+            return Array.from(row.cells)
+                .filter(td => td.dataset.colId &&
+                              !td.querySelector('.filename-input') &&
+                              !td.querySelector('.computed'))
+                .map(td => td.querySelector('input'))
+                .filter(Boolean);
+        }
+
+        // Core insert — adds a blank DOM row. Called internally by loadFolder/onload too.
+        function insertRowHandler() {
+            let insertIdx = -1; // -1 = append at end
+            if (selectedCells.length > 0) {
+                insertIdx = selectedCells[0].closest('tr').sectionRowIndex;
+            }
+
+            const tr      = tableBody.insertRow(insertIdx);
+            const headers = document.getElementById('headerRow').cells;
+            for (let i = 0; i < headers.length; i++) {
+                const isPreview = (headers[i].id === 'computedHeader');
+                const isFile    = (headers[i].id === 'firstHeader');
+                const isTime    = (headers[i].id === 'timeHeader');
+                const isImg     = (headers[i].id === 'imgHeader');
+                const colId     = headers[i].dataset.colId;
+                tr.appendChild(createCell(isPreview, colId, isFile, isImg, isTime));
+            }
+            refreshFilenames();
+            refreshNo();
+            clearSelection();
+            const firstInput = tr.querySelector('input:not([readonly])');
+            if (firstInput) firstInput.focus();
+        }
+
+        // Button handler: shift editable values DOWN from cursor row, clear cursor row as blank slot.
+        // Total row count never changes — no guard needed.
+        function insertRowBtn() {
+            const rows = tableBody.rows;
+            if (!rows.length) return;
+
+            // Use selectedCells to find current row (set by onfocus on every input click).
+            // Fallback: last row.
+            const targetCell = selectedCells.length > 0 ? selectedCells[0] : null;
+            const targetRow  = targetCell
+                                   ? targetCell.closest('tr')
+                                   : rows[rows.length - 1];
+            const insertIdx  = targetRow.sectionRowIndex; // 0-based in tbody
+
+            // Shift editable values DOWN: iterate bottom-up so we don't overwrite before copying
+            for (let i = rows.length - 1; i > insertIdx; i--) {
+                const src = getEditableInputs(rows[i - 1]);
+                const dst = getEditableInputs(rows[i]);
+                dst.forEach((inp, j) => { inp.value = src[j] ? src[j].value : ''; });
+                updateRowPreview(rows[i]);
+            }
+
+            // Clear editable inputs at insertIdx — becomes the blank inserted slot
+            getEditableInputs(rows[insertIdx]).forEach(inp => { inp.value = ''; });
+            updateRowPreview(rows[insertIdx]);
+
+            refreshFilenames();
+            refreshNo();
+
+            // Restore focus to same row so repeated clicks keep working
+            clearSelection();
+            const firstInput = getEditableInputs(rows[insertIdx])[0];
+            if (firstInput) firstInput.focus();
+            setStatus(`Row ${insertIdx + 1} inserted — values shifted down.`);
+        }
+
+        function deleteRowHandler() {
+            const rows = tableBody.rows;
+            if (!rows.length) return;
+
+            // Use selectedCells to find current row (set by onfocus on every input click).
+            // Fallback: last row.
+            const targetCell = selectedCells.length > 0 ? selectedCells[0] : null;
+            const targetRow  = targetCell
+                                   ? targetCell.closest('tr')
+                                   : rows[rows.length - 1];
+            const delIdx     = targetRow.sectionRowIndex; // 0-based in tbody
+
+            // Shift editable values UP: each row gets values from the row below it
+            for (let i = delIdx; i < rows.length - 1; i++) {
+                const src = getEditableInputs(rows[i + 1]);
+                const dst = getEditableInputs(rows[i]);
+                dst.forEach((inp, j) => { inp.value = src[j] ? src[j].value : ''; });
+                updateRowPreview(rows[i]);
+            }
+
+            // Clear editable columns of the last row (its values were copied up)
+            getEditableInputs(rows[rows.length - 1]).forEach(inp => { inp.value = ''; });
+            updateRowPreview(rows[rows.length - 1]);
+
+            refreshFilenames();
+            refreshNo();
+
+            // Restore focus to same row index (clamped to last row if we were at the bottom)
+            clearSelection();
+            const nextIdx   = Math.min(delIdx, rows.length - 1);
+            const nextInput = getEditableInputs(rows[nextIdx])[0];
+            if (nextInput) nextInput.focus();
+            setStatus(`Row ${delIdx + 1} deleted — values shifted up. ${loadedFilenames.length} files in folder.`);
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Cell creation
+        ═══════════════════════════════════════════════ */
+
+        function createCell(isComp = false, colId = null, isFile = false, isImg = false, isTime = false) {
+            const td = document.createElement('td');
+            if (colId) td.dataset.colId = colId;
+
+            if (isImg) {
+                const btn = document.createElement('button');
+                btn.innerText   = "Show";
+                btn.className   = "btn-intable btn-secondary";
+                const img = document.createElement('img');
+                img.classList.add('thumb-img');
+
+                btn.onclick = async () => {
+                    const row   = td.parentElement;
+                    const fname = row.cells[1].querySelector('input').value;
+                    if (fname && directoryHandle) {
+                        try {
+                            const fileHandle = await directoryHandle.getFileHandle(fname);
+                            const file       = await fileHandle.getFile();
+                            const blobUrl    = URL.createObjectURL(file);
+                            img.src           = blobUrl;
+                            img.style.display = "block";
+                            btn.style.display = "none";
+                        } catch(err) {
+                            console.error("Could not load image:", fname, err);
+                        }
+                    }
+                };
+                td.appendChild(btn);
+                td.appendChild(img);
+
+            } else {
+                const input = (colId === 'col0')
+                    ? document.createTextNode('')
+                    : document.createElement('input');
+
+                if (isComp) { input.readOnly = true; input.classList.add('computed'); }
+                if (isFile) { input.readOnly = true; input.classList.add('filename-input'); }
+                if (isTime) { input.readOnly = true; input.classList.add('filename-input'); input.style.fontSize = '12px'; }
+
+                td.appendChild(input);
+
+                input.onfocus  = (e) => {
+                    if (!e.shiftKey) { if (!isDragging) { clearSelection(); rangeOriginTd = td; } }
+                    selectCell(e, td);
+                };
+                input.oninput  = ()  => updateRowPreview(td.parentElement);
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        moveFocusDown(input);
+                    }
+                };
+            }
+
+            td.onmousedown = (e) => {
+                if (e.target.tagName !== 'INPUT' && isSmartCell(td)) {
+                    if (!e.shiftKey) { clearSelection(); rangeOriginTd = td; }
+                    selectCell(e, td);
+                }
+            };
+            return td;
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Column management
+        ═══════════════════════════════════════════════ */
+
+        function addColumn() {
+            colCounter++;
+            const id = colCounter;
+            const th = document.createElement('th');
+            th.dataset.colId = id;
+            th.innerHTML = `Col ${id} <button class="btn-intable btn-success" onclick="smartFillCol(${id})">⚡</button> <button class="btn-intable btn-danger" onclick="deleteColumn(${id})">✕ Col</button>`;
+            document.getElementById('headerRow').insertBefore(th, document.getElementById('computedHeader'));
+            for (let row of tableBody.rows) {
+                row.insertBefore(createCell(false, id, false, false, false), row.cells[row.cells.length - 1]);
+            }
+        }
+
+        function deleteColumn(colId) {
+            const headerRow = document.getElementById('headerRow');
+            const colIdx = Array.from(headerRow.cells).findIndex(th => th.dataset.colId == colId);
+            if (colIdx > -1) {
+                headerRow.deleteCell(colIdx);
+                for (let row of tableBody.rows) {
+                    row.deleteCell(colIdx);
+                    updateRowPreview(row);
+                }
+            }
+        }
+
+
+
+
+//extract original filename
+/* ═══════════════════════════════════════════════
+   Character Extraction from Original Filename
+═══════════════════════════════════════════════ */
+function extractFromOriginal(filename, pattern) {
+    if (!filename) return "";
+    
+    // Use the base filename (excluding extension) for 1-based index mapping
+    const baseFile = filename.includes('.') ? filename.substring(0, filename.lastIndexOf('.')) : filename;
+    
+    // Remove brackets and spaces
+    const inner = pattern.replace(/[\[\]\s]/g, ''); 
+    const parts = inner.split(',');
+    let result = '';
+
+    for (const part of parts) {
+        if (part.includes('-')) {
+            const [startStr, endStr] = part.split('-');
+            const start = parseInt(startStr, 10);
+            const end = parseInt(endStr, 10);
+            
+            if (!isNaN(start) && !isNaN(end)) {
+                // Support both forward [3-6] and reverse [6-3] extractions
+                if (start <= end) {
+                    for (let i = start; i <= end; i++) {
+                        if (i > 0 && i <= baseFile.length) result += baseFile[i - 1];
+                    }
+                } else {
+                    for (let i = start; i >= end; i--) {
+                        if (i > 0 && i <= baseFile.length) result += baseFile[i - 1];
+                    }
+                }
+            }
+        } else {
+            const idx = parseInt(part, 10);
+            if (!isNaN(idx) && idx > 0 && idx <= baseFile.length) {
+                result += baseFile[idx - 1];
+            }
+        }
+    }
+    return result;
+}
+        /* ═══════════════════════════════════════════════
+           Preview computation
+        ═══════════════════════════════════════════════ */
+
+function updateRowPreview(row) {
+    const inputs = Array.from(row.cells)
+        .slice(4, row.cells.length - 1)
+        .map(td => td.querySelector('input'))
+        .filter(i => i && i.value.trim() !== "");
+
+    const originalFile = row.cells[1].querySelector('input').value;
+    const ext          = originalFile.includes('.') ? originalFile.split('.').pop() : "";
+    
+    // 提取不带后缀的文件名，供正则匹配使用
+    const baseOriginalFile = originalFile.includes('.') ? originalFile.substring(0, originalFile.lastIndexOf('.')) : originalFile;
+    
+    const baseName = inputs.map(i => {
+        const val = i.value.trim();
+        
+        // 1. 匹配中括号位置提取 (例如 [3-6], [5,3,2])
+        if (/^\[[0-9,\-\s]+\]$/.test(val)) {
+            return extractFromOriginal(originalFile, val);
+        }
+        
+        // 2. 匹配正则表达式提取 (前后被 / 包裹，例如 /_[0-9]+/)
+        if (val.startsWith('/') && val.endsWith('/') && val.length > 2) {
+            // 剥离前后的斜杠，得到真正的正则字符串
+            const regexStr = val.substring(1, val.length - 1);
+            try {
+                const regex = new RegExp(regexStr);
+                const match = baseOriginalFile.match(regex);
+                
+                if (match) {
+                    // 如果用户使用了括号捕获组 (如 /date-(.*)/)，优先返回组里的内容 match[1]
+                    // 否则返回整个匹配到的字符串 match[0]
+                    return match[1] !== undefined ? match[1] : match[0];
+                }
+                return ""; // 如果正则写对了，但是原文件名里没有匹配到任何内容，返回空
+            } catch (e) {
+                // 正则语法错误捕获，避免整个网页脚本崩溃，并给用户直观的报错提示
+                return "【RegExp Error】";
+            }
+        }
+        
+        // 3. 普通文本，直接原样返回
+        return val;
+    }).join('');
+
+    const preview = row.querySelector('.computed');
+
+    if (preview) {
+        preview.value = baseName ? (ext ? `${baseName}.${ext}` : baseName) : "";
+    }
+}        /* ═══════════════════════════════════════════════
+           Selection helpers  — range-aware
+        ═══════════════════════════════════════════════ */
+
+        let rangeOriginTd = null;   // anchor cell for shift-click / drag
+        let isDragging    = false;
+
+        /** Is this td an editable smart-col cell (not filename / computed / img / No)? */
+        function isSmartCell(td) {
+            if (!td || !td.dataset || !td.dataset.colId) return false;
+            const inp = td.querySelector('input');
+            if (!inp) return false;
+            if (inp.classList.contains('computed'))       return false;
+            if (inp.classList.contains('filename-input')) return false;
+            return true;
+        }
+
+        /** Return {rowMin,rowMax,colMin,colMax} in tbody row/cell index space */
+        function getRangeBox(tdA, tdB) {
+            const rA = tdA.parentElement.sectionRowIndex, cA = tdA.cellIndex;
+            const rB = tdB.parentElement.sectionRowIndex, cB = tdB.cellIndex;
+            return {
+                rowMin: Math.min(rA, rB), rowMax: Math.max(rA, rB),
+                colMin: Math.min(cA, cB), colMax: Math.max(cA, cB)
+            };
+        }
+
+        /** Highlight all smart-cells in the rectangle from rangeOriginTd to tdEnd */
+        function applyRangeSelection(tdEnd) {
+            clearSelectionVisual();
+            if (!rangeOriginTd) return;
+            const box = getRangeBox(rangeOriginTd, tdEnd);
+            const rows = tableBody.rows;
+            for (let r = box.rowMin; r <= box.rowMax; r++) {
+                for (let c = box.colMin; c <= box.colMax; c++) {
+                    const td = rows[r] && rows[r].cells[c];
+                    if (td && isSmartCell(td)) {
+                        td.classList.add('selected-cell');
+                        selectedCells.push(td);
+                    }
+                }
+            }
+            rangeOriginTd.classList.add('range-origin');
+        }
+
+        function clearSelectionVisual() {
+            selectedCells.forEach(cell => {
+                cell.classList.remove('selected-cell');
+                cell.classList.remove('range-origin');
+            });
+            selectedCells = [];
+        }
+
+        function clearSelection() {
+            clearSelectionVisual();
+            rangeOriginTd = null;
+        }
+
+        /** Called by input onfocus and td onmousedown */
+        function selectCell(event, td) {
+            if (!isSmartCell(td)) return;
+
+            if (event.shiftKey && rangeOriginTd) {
+                // Extend selection from origin to this cell
+                clearSelectionVisual();
+                applyRangeSelection(td);
+                return;
+            }
+
+            if (!event.ctrlKey) {
+                clearSelection();
+            }
+
+            rangeOriginTd = td;
+            td.classList.add('selected-cell');
+            td.classList.add('range-origin');
+            selectedCells.push(td);
+        }
+
+        /* ── Drag-to-select ── */
+        document.addEventListener('mousedown', (e) => {
+            const td = e.target.closest('td');
+            if (td && isSmartCell(td)) {
+                isDragging = true;
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || !rangeOriginTd) return;
+            const td = e.target.closest('td');
+            if (td && isSmartCell(td)) {
+                clearSelectionVisual();
+                applyRangeSelection(td);
+            }
+        });
+
+        document.addEventListener('mouseup', () => { isDragging = false; });
+
+
+        /* ═══════════════════════════════════════════════
+           Copy / Paste  (Ctrl+C / Ctrl+V)
+           Only operates on btn-smart-col editable cells.
+        ═══════════════════════════════════════════════ */
+
+        document.addEventListener('keydown', (e) => {
+            const activeTag = document.activeElement.tagName;
+
+            /* ── Delete: clear selected range ── */
+            if ((e.key === 'Delete' || e.key === 'Backspace') && selectedCells.length > 1) {
+                // Only bulk-delete when multiple cells are selected (single cell: let input handle it normally)
+                e.preventDefault();
+                selectedCells.forEach(td => {
+                    if (isSmartCell(td)) {
+                        td.querySelector('input').value = '';
+                        updateRowPreview(td.parentElement);
+                    }
+                });
+                setStatus(`🗑 Cleared ${selectedCells.length} cell(s).`);
+                return;
+            }
+
+            /* ── Ctrl+C: copy selected range ── */
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedCells.length > 0) {
+                // Check if user is selecting text inside an input — let default handle it
+                const inp = document.activeElement;
+                if (inp.tagName === 'INPUT' && inp.selectionStart !== inp.selectionEnd) return;
+
+                e.preventDefault();
+
+                // Build a 2-D grid from selectedCells
+                const rows  = tableBody.rows;
+                const box   = getRangeBox(selectedCells[0], selectedCells[selectedCells.length - 1]);
+                const lines = [];
+                for (let r = box.rowMin; r <= box.rowMax; r++) {
+                    const rowVals = [];
+                    for (let c = box.colMin; c <= box.colMax; c++) {
+                        const td = rows[r] && rows[r].cells[c];
+                        if (td && isSmartCell(td)) {
+                            rowVals.push((td.querySelector('input').value) || '');
+                        }
+                    }
+                    if (rowVals.length) lines.push(rowVals.join('\t'));
+                }
+                const clipText = lines.join('\n');
+                navigator.clipboard.writeText(clipText).catch(() => {
+                    // Fallback: silent copy via textarea trick (no browser permission prompt)
+                    const ta = document.createElement('textarea');
+                    ta.value = clipText; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                    document.body.appendChild(ta); ta.select();
+                    document.execCommand('copy'); document.body.removeChild(ta);
+                });
+                selectedCells.forEach(td => {
+                    td.classList.add('copy-flash');
+                    setTimeout(() => td.classList.remove('copy-flash'), 400);
+                });
+                setStatus(`📋 Copied ${selectedCells.length} cell(s) — ${lines.length} row(s) × ${lines[0] ? lines[0].split('\t').length : 0} col(s).`);
+                return;
+            }
+
+            /* ── Ctrl+V: paste into range starting at origin ── */
+            if ((e.ctrlKey || e.metaKey) && e.key === 'v' && rangeOriginTd) {
+                const inp = document.activeElement;
+                // If cursor is in an input with editable content and no range selected, let default paste
+                if (inp.tagName === 'INPUT' && selectedCells.length <= 1 && !rangeOriginTd) return;
+
+                e.preventDefault();
+                navigator.clipboard.readText().then(text => {
+                    if (!text) return;
+                    const pasteRows = text.split('\n').map(r => r.split('\t'));
+                    const rows      = tableBody.rows;
+                    const startRow  = rangeOriginTd.parentElement.sectionRowIndex;
+                    const startCol  = rangeOriginTd.cellIndex;
+
+                    let pastedCount = 0;
+                    for (let r = 0; r < pasteRows.length; r++) {
+                        const targetRowIdx = startRow + r;
+                        if (targetRowIdx >= rows.length) break;
+                        for (let c = 0; c < pasteRows[r].length; c++) {
+                            const targetTd = rows[targetRowIdx].cells[startCol + c];
+                            if (targetTd && isSmartCell(targetTd)) {
+                                targetTd.querySelector('input').value = pasteRows[r][c];
+                                pastedCount++;
+                            }
+                        }
+                        updateRowPreview(rows[targetRowIdx]);
+                    }
+                    setStatus(`📋 Pasted ${pastedCount} cell(s).`);
+                });
+                return;
+            }
+        });
+
+
+        /* ═══════════════════════════════════════════════
+           Column fill validation
+           colId = null  → validate ALL user columns
+           colId = id    → validate only that one column
+           Rules per column checked:
+             • entirely empty            → OK, skip
+             • only 1 row filled         → error
+             • first filled row ≠ row 1  → error
+             • gap between filled rows   → error
+           Returns null if OK, or error string if not.
+        ═══════════════════════════════════════════════ */
+
+        function validateColumnFill(colId = null) {
+            const headerCells = Array.from(document.getElementById('headerRow').cells);
+            const rows        = tableBody.rows;
+            const problems    = [];
+
+            headerCells.forEach(th => {
+                if (!th.dataset.colId) return;                          // skip fixed columns
+                if (colId !== null && th.dataset.colId != colId) return; // skip other cols if single-col check
+
+                const colIdx  = th.cellIndex;
+                const colName = `Col ${th.dataset.colId}`;
+
+                // Collect indices of filled rows in this column
+                const filledRows = [];
+                for (let i = 0; i < rows.length; i++) {
+                    const td    = rows[i].cells[colIdx];
+                    const input = td ? td.querySelector('input') : null;
+                    if (input && input.value.trim() !== '') filledRows.push(i);
+                }
+
+                if (filledRows.length === 0) return; // entirely empty → OK
+
+                if (filledRows.length === 1) {
+                    problems.push(`${colName}: only row ${filledRows[0] + 1} is filled.\n  → Fill at least 2 rows starting from row 1 to form a pattern.`);
+                    return;
+                }
+
+                if (filledRows[0] !== 0) {
+                    problems.push(`${colName}: starts at row ${filledRows[0] + 1}, not row 1.\n  → Must fill from row 1 downward.`);
+                    return;
+                }
+
+                for (let k = 1; k < filledRows.length; k++) {
+                    if (filledRows[k] !== filledRows[k - 1] + 1) {
+                        problems.push(`${colName}: row ${filledRows[k-1] + 1} filled but row ${filledRows[k-1] + 2} is empty.\n  → Fill rows top-down without skipping.`);
+                        return;
+                    }
+                }
+            });
+
+            return problems.length === 0 ? null : problems.join('\n\n');
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Smart fill
+        ═══════════════════════════════════════════════ */
+
+        function smartFillAll() {
+            // Validate all columns before filling
+            const err = validateColumnFill(null);
+            if (err) { alert('⚠ Smart Fill blocked:\n\n' + err); return; }
+            document.querySelectorAll('th[data-col-id]').forEach(th => smartFillCol(th.dataset.colId, true));
+        }
+
+       function smartFillCol(colId, skipValidation = false) {
+            // Validate this single column unless called internally by smartFillAll
+            if (!skipValidation) {
+                const err = validateColumnFill(colId);
+                if (err) { alert('⚠ Smart Fill blocked:\n\n' + err); return; }
+            }
+
+            const rows        = tableBody.rows;
+            const headerCells = Array.from(document.getElementById('headerRow').cells);
+            const colIdx      = headerCells.findIndex(th => th.dataset.colId == colId);
+
+            const filled = [];
+            for (let i = 0; i < rows.length; i++) {
+                const input = rows[i].cells[colIdx].querySelector('input');
+                const val   = input.value.trim();
+                if (val !== "") {
+                    filled.push({ idx: i, val: val, input: input });
+                }
+            }
+
+            if (filled.length < 2) return;
+
+            const lastFilled  = filled[filled.length - 1];
+            const patternData = detectPattern(filled.map(f => f.val));
+
+            for (let i = lastFilled.idx + 1; i < rows.length; i++) {
+                 const originalFileInp = rows[i].cells[1].querySelector('input');
+                if (!originalFileInp || originalFileInp.value.trim() === "") {
+                    continue; 
+                }
+ 
+                const input = rows[i].cells[colIdx].querySelector('input');
+
+                if (patternData.type === 'alphanumeric') {
+                    const prevVal = rows[i - 1].cells[colIdx].querySelector('input').value;
+                    const match   = prevVal.match(/^(\D*(?:\d*\D+)*)(\d+)$/);
+                    if (match && match[1] !== undefined && match[2] !== undefined) {
+                        const leftText  = match[1];
+                        const prevNum   = parseInt(match[2], 10);
+                        const nextNum   = prevNum + patternData.step;
+                        const nextNumStr = String(nextNum).padStart(match[2].length, '0');
+                        input.value = leftText + nextNumStr;
+                    } else {
+                        const patternIndex = (i - lastFilled.idx - 1) % patternData.data.length;
+                        input.value = patternData.data[patternIndex];
+                    }
+
+                } else if (patternData.type === 'arithmetic_num') {
+                    const prevVal = parseFloat(rows[i - 1].cells[colIdx].querySelector('input').value);
+                    input.value = prevVal + patternData.step;
+
+                } else if (patternData.type === 'arithmetic_char') {
+                    const prevVal  = rows[i - 1].cells[colIdx].querySelector('input').value;
+                    const charCode = prevVal.charCodeAt(0);
+                    const step     = patternData.step;
+                    input.value    = getNextChar(charCode, step);
+
+                } else if (patternData.type === 'repeating_arithmetic') {
+                    const totalIndex = i - lastFilled.idx + (filled.length - 1);
+                    const blockIdx   = Math.floor(totalIndex / patternData.blockSize);
+                    input.value = patternData.baseValue + (blockIdx * patternData.step);
+
+                // ── NEW LOGIC FOR REPEATING CHARACTERS ──
+                } else if (patternData.type === 'repeating_char_arithmetic') {
+                    // Calculate which block this row belongs to based on absolute row index
+                    const blockIdx = Math.floor(i / patternData.blockSize);
+                    // Get the first character of the sequence (from Row 1)
+                    const baseCharCode = filled[0].val.charCodeAt(0);
+                    // Calculate character for this block
+                    input.value = getNextChar(baseCharCode, blockIdx * patternData.step);
+
+                } else {
+                    const patternIndex = (i - lastFilled.idx - 1) % patternData.data.length;
+                    input.value = patternData.data[patternIndex];
+                }
+
+                if (typeof updateRowPreview === 'function') {
+                    updateRowPreview(rows[i]);
+                }
+            }
+        }
+
+        /**
+         * Helper to handle A-Z / a-z wrapping for character increments
+         */
+        function getNextChar(charCode, step) {
+            if (charCode >= 65 && charCode <= 90) {        // A-Z
+                let nextPos = (charCode - 65 + step) % 26;
+                if (nextPos < 0) nextPos += 26;
+                return String.fromCharCode(65 + nextPos);
+            } else if (charCode >= 97 && charCode <= 122) { // a-z
+                let nextPos = (charCode - 97 + step) % 26;
+                if (nextPos < 0) nextPos += 26;
+                return String.fromCharCode(97 + nextPos);
+            }
+            return String.fromCharCode(charCode + step);
+        }
+
+        function detectPattern(values) {
+            if (values.length < 2) return { type: 'repeat', data: values };
+// 如果列中存在 [提取] 或 /正则/ 语法，自动填充时不进行递增，而是直接重复该规则
+    if (values.some(v => {
+        const val = v.trim();
+        const isBracket = /^\[[0-9,\-\s]+\]$/.test(val);
+        const isRegExp = val.startsWith('/') && val.endsWith('/') && val.length > 2;
+        return isBracket || isRegExp;
+    })) {
+        return { type: 'repeat', data: values };
+    }
+    // ══════════════ NEW FEATURE END ══════════════
+
+            // 1. Alphanumeric
+            const alphanumericMatches = values.map(v => v.match(/^(\D*(?:\d*\D+)*)(\d+)$/));
+            if (alphanumericMatches.every(m => m !== null && m[1] !== undefined && m[2] !== undefined)) {
+                const numParts       = alphanumericMatches.map(m => parseInt(m[2], 10));
+                const textParts      = alphanumericMatches.map(m => m[1]);
+                const numStep        = numParts[1] - numParts[0];
+                const isNumArithmetic = numParts.every((n, i) => i === 0 || n - numParts[i - 1] === numStep);
+                const isTextConsistent = textParts.every(t => t === textParts[0]);
+
+                if (isNumArithmetic && isTextConsistent) {
+                    return { type: 'alphanumeric', step: numStep, data: values };
+                }
+            }
+
+            // 2. Numeric
+            const nums       = values.map(v => parseFloat(v));
+            const allNumeric = nums.every(n => !isNaN(n));
+
+            if (allNumeric) {
+                const step = nums[1] - nums[0];
+
+                if (nums.every((n, i) => i === 0 || Math.abs((n - nums[i - 1]) - step) < 0.0001)) {
+                    return { type: 'arithmetic_num', step: step };
+                }
+
+                // 3. Repeating arithmetic (e.g. 5,5,7,7)
+                for (let blockSize = 2; blockSize <= values.length / 2; blockSize++) {
+                    if (values.length % blockSize === 0) {
+                        let steps   = [];
+                        let isValid = true;
+                        for (let i = 0; i < values.length; i += blockSize) {
+                            const block = nums.slice(i, i + blockSize);
+                            if (!block.every(v => v === block[0])) { isValid = false; break; }
+                            if (i > 0) steps.push(block[0] - nums[i - blockSize]);
+                        }
+                        if (isValid && steps.length > 0 && steps.every(s => s === steps[0] && s !== 0)) {
+                            return { type: 'repeating_arithmetic', step: steps[0], blockSize: blockSize, baseValue: nums[0] };
+                        }
+                    }
+                }
+            }
+
+            // 4. Single character (Standard A, B, C...)
+            if (values.every(v => v.length === 1 && /[a-zA-Z]/.test(v))) {
+                const codes = values.map(v => v.charCodeAt(0));
+                const step  = codes[1] - codes[0];
+                if (codes.every((c, i) => i === 0 || c - codes[i - 1] === step)) {
+                    return { type: 'arithmetic_char', step: step };
+                }
+
+                // ══════════════ NEW FEATURE START ══════════════
+                // 5. Repeating Character Pattern (e.g., A,A,B,B -> C,C,D,D)
+                for (let blockSize = 2; blockSize <= values.length / 2; blockSize++) {
+                    if (values.length % blockSize === 0) {
+                        let charSteps = [];
+                        let isValid = true;
+                        
+                        for (let i = 0; i < values.length; i += blockSize) {
+                            const block = values.slice(i, i + blockSize);
+                            // Check if all items in the current block are the same (e.g., 'A','A')
+                            if (!block.every(v => v === block[0])) { isValid = false; break; }
+                            
+                            // Calculate step between this block and the previous one
+                            if (i > 0) {
+                                charSteps.push(block[0].charCodeAt(0) - values[i - blockSize].charCodeAt(0));
+                            }
+                        }
+
+                        if (isValid && charSteps.length > 0 && charSteps.every(s => s === charSteps[0] && s !== 0)) {
+                            return { 
+                                type: 'repeating_char_arithmetic', 
+                                step: charSteps[0], 
+                                blockSize: blockSize 
+                            };
+                        }
+                    }
+                }
+                // ══════════════ NEW FEATURE END ══════════════
+            }
+
+            return { type: 'repeat', data: values };
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Load & Reset
+        ═══════════════════════════════════════════════ */
+
+        async function ResetRefresh() {
+            for (let row of tableBody.rows) {
+                row.querySelectorAll('input').forEach(i => {
+                    if (!i.classList.contains('filename-input') && !i.classList.contains('computed')) {
+                        i.value = '';
+                    }
+                });
+                updateRowPreview(row);
+            }
+            directoryHandle = null;   // force picker
+            await refreshFolder();
+            refreshFilenames();
+            refreshNo();
+        }
+
+        async function refreshFolder() {
+            if (!directoryHandle) {
+                await loadFolder();
+                if (!directoryHandle) return;  // user cancelled picker
+            }
+
+            try {
+                const status = await directoryHandle.requestPermission({ mode: 'readwrite' });
+                if (status !== 'granted') return;
+
+                const activeExts2 = getSelectedExtensions(); // null = *.* all files
+                const extRegex2   = activeExts2 && activeExts2.length > 0
+                    ? new RegExp('\\.(' + activeExts2.map(e => e.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')$', 'i')
+                    : null;
+
+                let tempEntries = [];
+                for await (const entry of directoryHandle.values()) {
+                    if (entry.kind === 'file' && (!extRegex2 || extRegex2.test(entry.name.toLowerCase()))) {
+                        tempEntries.push(entry);
+                    }
+                }
+                tempEntries.sort((a, b) => a.name.localeCompare(b.name));
+                loadedFilenames = tempEntries.map(e => e.name);
+
+                if (tempEntries.length > 0) setStatus("Reading file timestamps... please wait.");
+                loadedFileTimes = await Promise.all(tempEntries.map(async (entry) => {
+                    try {
+                        const fh = await directoryHandle.getFileHandle(entry.name);
+                        const file = await fh.getFile();
+                        return file.lastModified;
+                    } catch (e) {
+                        return 0; // Fallback
+                    }
+                }));
+
+                // ── Warn if folder has no matching files ──
+                if (loadedFilenames.length === 0) {
+                    warnNoImages(directoryHandle.name);
+                    setControlsEnabled(false);
+                    return;
+                }
+
+                while (tableBody.rows.length < loadedFilenames.length) insertRowHandler();
+
+                refreshFilenames();
+                
+                // ── Enable controls after a successful load ──
+                setControlsEnabled(true);
+                setStatus(`${loadedFilenames.length} file(s) loaded from "${directoryHandle.name}". Edit columns, then use Rename All.`);
+
+                // ── Update button label to show last-used folder ──
+                const btn = document.getElementById('btnLoadReset');
+                btn.innerHTML = `📂 Refresh: "${directoryHandle.name}"`;
+                btn.title = 'Click to reopen this folder. Shift+click to pick a new folder.';
+                const forgetBtn = document.getElementById('btnForgetFolder');
+                if (forgetBtn) forgetBtn.style.display = 'inline-block';
+
+            } catch (e) {
+                console.error("Refresh failed:", e);
+            }
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Load folder (file-picker)
+        ═══════════════════════════════════════════════ */
+
+        async function loadFolder() {
+            try {
+                directoryHandle = await window.showDirectoryPicker({
+                    id:      'smart-fill',
+                    mode:    'readwrite',
+                    startIn: 'pictures'
+                });
+                
+                const activeExts = getSelectedExtensions(); // null = *.* all files
+                const extRegex   = activeExts && activeExts.length > 0
+                    ? new RegExp('\\.(' + activeExts.map(e => e.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')$', 'i')
+                    : null; // null = accept all files
+
+                let tempEntries = [];
+                for await (const entry of directoryHandle.values()) {
+                    if (entry.kind === 'file' && (!extRegex || extRegex.test(entry.name.toLowerCase()))) {
+                        tempEntries.push(entry);
+                    }
+                }
+                tempEntries.sort((a, b) => a.name.localeCompare(b.name));
+                loadedFilenames = tempEntries.map(e => e.name);
+
+                if (tempEntries.length > 0) setStatus("Reading file timestamps... please wait.");
+                loadedFileTimes = await Promise.all(tempEntries.map(async (entry) => {
+                    try {
+                        const fh = await directoryHandle.getFileHandle(entry.name);
+                        const file = await fh.getFile();
+                        return file.lastModified;
+                    } catch (e) {
+                        return 0; // Fallback
+                    }
+                }));
+
+                // ── Warn if folder has no matching files ──
+                if (loadedFilenames.length === 0) {
+                    const extLabel = activeExts.length > 0 ? activeExts.map(e=>'.'+e).join(', ') : 'any';
+                    const msg = `⚠ No files matching [${extLabel}] found in "${directoryHandle.name}".\nTry changing the file extension filter or selecting a different folder.`;
+                    alert(msg);
+                    setStatus(`⚠ No matching files found in "${directoryHandle.name}" — adjust the extension filter and try again.`);
+                    directoryHandle = null;
+                    setControlsEnabled(false);
+                    return;
+                }
+
+                while (tableBody.rows.length < loadedFilenames.length) insertRowHandler();
+                refreshFilenames();
+                
+                // ── Persist handle so user can reopen without picker next time ──
+                await saveHandleToDB(directoryHandle);
+
+                // ── Update button label ──
+                const btn = document.getElementById('btnLoadReset');
+                btn.innerHTML = `📂 Reopen: "${directoryHandle.name}"`;
+                btn.title = 'Click to reopen this folder. Shift+click to pick a new folder.';
+                const forgetBtn = document.getElementById('btnForgetFolder');
+                if (forgetBtn) forgetBtn.style.display = 'inline-block';
+
+            } catch (e) {
+                if (e.name !== 'AbortError') console.error(e);
+                // If user cancelled, leave directoryHandle as null silently
+            }
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Rename all files
+        ═══════════════════════════════════════════════ */
+
+        async function renameAllFiles() {
+            if (!directoryHandle) return alert("Select folder first.");
+
+            // Validate all columns before renaming
+            const err = validateColumnFill(null);
+            if (err) { alert('⚠ Cannot rename — please fix column data first:\n\n' + err); return; }
+
+            const rows     = Array.from(tableBody.rows);
+            const newNames = rows
+                .map(r => r.cells[r.cells.length - 1].querySelector('input').value.trim())
+                .filter(v => v !== "");
+
+            if (new Set(newNames).size !== newNames.length) {
+                return alert("Rejected: Duplicate filenames in Preview column.");
+            }
+
+            const status = await directoryHandle.requestPermission({ mode: 'readwrite' });
+            if (status !== 'granted') return;
+
+            let renamedCount = 0;
+            let skippedCount = 0;
+            const errors = [];
+
+            for (let row of rows) {
+                const oldN = row.cells[1].querySelector('input').value.trim();
+                const newN = row.cells[row.cells.length - 1].querySelector('input').value.trim();
+                if (oldN && newN && oldN !== newN) {
+                    try {
+                        const fh = await directoryHandle.getFileHandle(oldN);
+
+                        // ══════════════ FOLDER CREATION UPGRADE START ══════════════
+                        // Check if the new name contains a slash (indicating a folder path)
+                        if (newN.includes('/')) {
+                            const parts = newN.split('/');
+                            const finalFileName = parts.pop(); // The actual filename at the end
+                            
+                            // Traverse and create folders level by level
+                            let targetDirHandle = directoryHandle;
+                            for (const folder of parts) {
+                                targetDirHandle = await targetDirHandle.getDirectoryHandle(folder, { create: true });
+                            }
+                            
+                            // Move the file into the target directory handle with the new name
+                            await fh.move(targetDirHandle, finalFileName);
+                        } else {
+                            // Standard rename in the same folder
+                            await fh.move(newN);
+                        }
+                        // ══════════════ FOLDER CREATION UPGRADE END ══════════════
+                        await fh.move(newN);
+                        renamedCount++;
+                    } catch (err) {
+                        errors.push(`${oldN} → ${newN}`);
+                        console.error(err);
+                    }
+                } else {
+                    skippedCount++;
+                }
+            }
+
+            //await loadFolder();
+
+            let msg = `✓ Renamed: ${renamedCount} file${renamedCount !== 1 ? 's' : ''}.`;
+            if (skippedCount > 0) msg += `  Unchanged: ${skippedCount}.`;
+            if (errors.length  > 0) msg += `  ⚠ Failed: ${errors.length} (see console).`;
+            setStatus(msg);
+            alert(msg);
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Page initialisation
+        ═══════════════════════════════════════════════ */
+
+        window.onload = () => {
+            for (let i = 0; i < 20; i++) insertRowHandler();
+            for (let i = 0; i < 3;  i++) addColumn();   // Three default columns
+            refreshNo();
+
+            // Disable everything except Load & Reset until a folder is opened
+            setControlsEnabled(false);
+            setStatus('Ready — click Load & Reset to open a folder, or use Reopen if shown.');
+
+            // Check IndexedDB for a previously used folder and update button if found
+            initMainButton();
+        };
+
+
+        function cleanupEmptyRows() {
+            const rows = tableBody.rows;
+            // 從最後一行開始往前檢查，保留最少 20 行 (索引 0~19)
+            for (let i = rows.length - 1; i >= 20; i--) {
+                const originalFilenameInput = rows[i].cells[1].querySelector('input');
+                // 如果 Original Filename 為空，則刪除該行
+                if (!originalFilenameInput || originalFilenameInput.value.trim() === "") {
+                    tableBody.deleteRow(i);
+                }
+            }
+            refreshNo(); // 重新整理序號
+        }
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"1912fd6176f84564a36a97f34122941d","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

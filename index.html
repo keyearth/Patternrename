@@ -55,9 +55,58 @@
 
         body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f0f2f5; }
 
+        @media (max-width: 600px) {
+            body { padding: 8px; }
+        }
+
         .container { max-width: 100%; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 20px; }
 
+        @media (max-width: 600px) {
+            .container { padding: 10px; border-radius: 6px; }
+        }
+
+        /* ── Browser compatibility banner ── */
+        #browserWarning {
+            display: none;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            color: #856404;
+            line-height: 1.6;
+        }
+        #browserWarning strong { color: #5a3e00; }
+        #browserWarning .browser-links { margin-top: 8px; display: flex; gap: 10px; flex-wrap: wrap; }
+        #browserWarning .browser-links a {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: white; border: 1px solid #ffc107; border-radius: 20px;
+            padding: 4px 12px; color: #856404; text-decoration: none;
+            font-weight: 600; font-size: 12px;
+        }
+        #browserWarning .browser-links a:hover { background: #fff8e1; }
+
+        /* ── Mobile notice banner ── */
+        #mobileNotice {
+            display: none;
+            background: #e8f4fd;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #0d47a1;
+            line-height: 1.5;
+        }
+        #mobileNotice strong { font-size: 14px; }
+
         .toolbar { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ddd; align-items: center; justify-content: center; }
+
+        @media (max-width: 600px) {
+            .toolbar { padding: 8px; gap: 6px; justify-content: flex-start; }
+            .toolbar button { font-size: 12px; padding: 5px 9px; }
+        }
 
         button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; transition: 0.2s; font-size: 13px; }
 
@@ -75,9 +124,17 @@
 
         .table-wrapper { overflow: auto; border: 1px solid #ccc; max-height: 70vh; }
 
+        @media (max-width: 600px) {
+            .table-wrapper { max-height: 55vh; font-size: 12px; }
+        }
+
         table { border-collapse: collapse; width: 100%; table-layout: auto; user-select: none; }
 
         th, td { border: 1px solid #ddd; padding: 0; min-width: 150px; height: 35px; position: relative; text-align: center; }
+
+        @media (max-width: 600px) {
+            th, td { min-width: 100px; height: 30px; }
+        }
 
         th { background: #f8f9fa; font-size: 11px; position: sticky; top: 0; z-index: 10; padding: 8px; color: #555; }
 
@@ -125,11 +182,17 @@
             font-size: 13px;
             color: #3730a3;
         }
+        @media (max-width: 600px) {
+            #statusBar { font-size: 11px; padding: 5px 10px; }
+        }
 
         /* ── App name branding ── */
         .app-name {
             display: flex; flex-direction: column; align-items: flex-start;
             margin-right: 16px;
+        }
+        @media (max-width: 600px) {
+            .app-name { margin-right: 0; width: 100%; }
         }
         .app-name-main {
             font-family: 'Segoe UI', sans-serif;
@@ -141,6 +204,9 @@
         .app-name-sub {
             font-size: 12px; font-weight: 600; letter-spacing: 3px;
             color: #aaa; margin-top: 3px; 
+        }
+        @media (max-width: 600px) {
+            .app-name-sub { letter-spacing: 1px; font-size: 10px; }
         }
         .app-name-sub span {
             color: red;
@@ -225,10 +291,140 @@
             color: #3730a3;
             border: 1px solid #c7d2fe;
         }
+
+        /* ── Toggle column buttons ── */
+        .btn-toggle {
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: #fff;
+            color: #555;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+        .btn-toggle.active {
+            background: #e8f5e9;
+            border-color: #28a745;
+            color: #1b5e20;
+        }
+        .btn-toggle:hover { border-color: #007bff; }
+
+        /* ── Welcome banner ── */
+        .welcome-banner {
+            background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);
+            border: 1px solid #c7d2fe;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        @media (max-width: 600px) {
+            .welcome-banner { padding: 10px 12px; gap: 10px; flex-wrap: wrap; }
+            .welcome-icon { display: none; }
+        }
+        .welcome-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+        .welcome-text h2 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e1b4b;
+            margin-bottom: 5px;
+        }
+        @media (max-width: 600px) {
+            .welcome-text h2 { font-size: 13px; }
+        }
+        .welcome-text p {
+            font-size: 13px;
+            color: #444;
+            line-height: 1.5;
+            margin: 0;
+        }
+        @media (max-width: 600px) {
+            .welcome-text p { font-size: 12px; }
+        }
+        .welcome-steps {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .step-pill {
+            background: white;
+            border: 1px solid #c7d2fe;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 12px;
+            color: #3730a3;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        @media (max-width: 600px) {
+            .step-pill { font-size: 11px; padding: 2px 8px; }
+        }
+        .step-pill span { color: #aaa; font-weight: 400; }
+
+        /* ── Column header friendlier labels ── */
+        .col-header-label { display: block; font-weight: 700; font-size: 12px; color: #333; }
+        .col-header-hint  { display: block; font-size: 10px; color: #999; font-weight: 400; margin-top: 1px; }
+
+        /* ── Optional column toggle area in toolbar ── */
+        .toolbar-divider {
+            width: 1px;
+            height: 28px;
+            background: #ddd;
+            flex-shrink: 0;
+        }
+        .toolbar-group-label {
+            font-size: 10px;
+            color: #aaa;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .optional-col-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        @media (max-width: 600px) {
+            .toolbar-divider { display: none; }
+            .optional-col-group { width: 100%; flex-wrap: wrap; }
+            .toolbar-group-label { font-size: 9px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+
+        <!-- ── Browser compatibility warning (shown if File System Access API unavailable) ── -->
+        <div id="browserWarning">
+            ⚠️ <strong>Your browser doesn't fully support this app.</strong><br>
+            PatternRename uses the <strong>File System Access API</strong> to read your folder and rename files directly.
+            This requires a <strong>Chromium-based desktop browser</strong> — Safari, Firefox, and all mobile browsers do not support it yet.<br>
+            For the best experience, please open this page in:
+            <div class="browser-links">
+                <a href="https://www.google.com/chrome/" target="_blank" rel="noopener">🟡 Google Chrome</a>
+                <a href="https://www.microsoft.com/en-us/edge" target="_blank" rel="noopener">🔵 Microsoft Edge</a>
+                <a href="https://brave.com/" target="_blank" rel="noopener">🦁 Brave</a>
+                <a href="https://www.opera.com/" target="_blank" rel="noopener">🔴 Opera</a>
+            </div>
+        </div>
+
+        <!-- ── Mobile notice (shown on small screens) ── -->
+        <div id="mobileNotice">
+            📱 <strong>Tip: This tool works best on a desktop PC.</strong><br>
+            You can browse and explore the app on your phone, but to actually rename files you'll need a desktop browser (Chrome or Edge on Windows/Mac/Linux). The File System Access API used for renaming is not supported on mobile yet.
+        </div>
+
+        <!-- ── Welcome banner ── -->
+        
 
         <div class="toolbar">
 
@@ -295,27 +491,67 @@
             <button id="btnLoadReset"    class="btn-reset"   onclick="handleMainButton(); zaraz.track('button_click', { button: 'LoadReset' })">▶ Load &amp; Reset</button>
             <button id="btnForgetFolder" class="btn-danger"  onclick="forgetFolder(); zaraz.track('button_click', { button: 'Changefolder' })" style="display:none;" title="Clear the saved folder so the next click picks a new one">✕ Change Folder</button>
             <button id="btnInsertRow"    class="btn-success" onclick="insertRowBtn(); zaraz.track('button_click', { button: 'Addrow' })">+ Insert Row</button>
-            <button id="btnAddColumn"    class="btn-primary" onclick="addColumn(); zaraz.track('button_click', { button: 'Addcol' })">+ Add Column</button>
+            <button id="btnAddColumn"    class="btn-primary" onclick="addColumn(); zaraz.track('button_click', { button: 'Addcol' })" title="Add a new name-part column — values from all part columns are joined to form the final filename">+ Add Name Part</button>
             <button id="btnDeleteRow"    class="btn-danger"  onclick="deleteRowHandler(); zaraz.track('button_click', { button: 'Delrow' })">✕ Delete Row</button>
             <button id="btnSmartFill"    class="btn-success" onclick="smartFillAll(); zaraz.track('button_click', { button: 'Smartfill' })">⚡ Smart Fill All</button>
             <button id="btnRenameAll"    class="btn-warning" onclick="renameAllFiles(); zaraz.track('button_click', { button: 'Rename' })">✎ Rename All Files</button>
 
+            <div class="toolbar-divider"></div>
+
+            <!-- ── Optional column toggles ── -->
+            <div class="optional-col-group">
+                <span class="toolbar-group-label">Optional columns:</span>
+                <button class="btn-toggle active" id="btnToggleTime" onclick="toggleOptionalColumn('time')" title="Show or hide the file modification time and gap between files">
+                    🕐 File Time
+                </button>
+                <button class="btn-toggle active" id="btnToggleImg" onclick="toggleOptionalColumn('img')" title="Show or hide the image thumbnail preview column (useful for image files only)">
+                    🖼 Image Preview
+                </button>
+            </div>
+
             <button class="btn-secondary" style="margin-left:auto;"><a href="help.html" onclick="zaraz.track('button_click', { button: 'help' })" style="color:white;text-decoration:none;">? Help</a></button>
         </div>
-
+<div class="welcome-banner">
+            <div class="welcome-icon">✏️</div>
+            <div class="welcome-text">
+                <h2>Rename many files at once — right in your browser</h2>
+                <p>
+                    Build a new filename by combining <strong>multiple name parts</strong> side-by-side.
+                    type a few values to Smart Fill a sequence.
+                    The live <em>New Filename Preview</em> live so you can verify before renaming anything.
+					Rows & columns can be extended as needed.
+                </p>
+                <div class="welcome-steps"><div class="step-pill">Steps: </div>
+                    <div class="step-pill">① Load a folder</div>
+                    <div class="step-pill">② Fill pattern unit</div>
+                    <div class="step-pill">③ ⚡ Smart Fill</div>
+                    <div class="step-pill">④ Check the Preview</div>
+                    <div class="step-pill">⑤ Rename All Files</div>
+                </div>
+            </div>
+        </div>
         <div class="table-wrapper">
             <table id="dataTable">
                 <thead>
                     <tr id="headerRow">
                         <th id="No" width="6">No</th>
-                        <th id="firstHeader">Original Filename</th>
-                        <th id="timeHeader" width="120px">Time [Diff]</th>
-                        <th id="imgHeader" width="60px">Img
+                        <th id="firstHeader">
+                            <span class="col-header-label">Original Filename</span>
+                            <span class="col-header-hint">loaded from your folder</span>
+                        </th>
+                        <th id="timeHeader" width="130px">
+                            <span class="col-header-label">🕐 File Time</span>
+                            <span class="col-header-hint">modified time · [gap from prev]</span>
+                        </th>
+                        <th id="imgHeader" width="70px">🖼 Preview
                             <button id="btnShowAll"
                                     class="btn-intable btn-success"
                                     onclick="displayAllImages()">Show all</button>
                         </th>
-                        <th id="computedHeader">New Filename Preview</th>
+                        <th id="computedHeader">
+                            <span class="col-header-label">✅ New Filename Preview</span>
+                            <span class="col-header-hint">all parts joined → ready to rename</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -325,7 +561,7 @@
         <div id="statusBar"></div>
 
 <div id="showhint"  style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:5px 12px; background:#eef2ff; border:1px solid #c7d2fe; border-radius:6px; font-size:13px; color:#3730a3; font-weight:600; user-select:none;">
-  <span id="showhint-arrow" style="transition:transform 0.2s;">▼</span> Quick-start examples 
+  <span id="showhint-arrow" style="transition:transform 0.2s;">▼</span> Pattern examples &amp; tips 
 </div>
 <br>
 
@@ -425,6 +661,25 @@ function toggleTips() {
     tips.style.maxHeight = open ? "1000px" : "0px";
     if (arrow) arrow.style.transform = open ? "rotate(90deg)" : "";
 }
+
+        /* ═══════════════════════════════════════════════
+           Browser & device compatibility detection
+        ═══════════════════════════════════════════════ */
+
+        (function checkCompatibility() {
+            // File System Access API requires showDirectoryPicker + FileSystemFileHandle.move
+            const hasAPI = typeof window.showDirectoryPicker === 'function';
+
+            const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                          || window.innerWidth < 768;
+
+            if (!hasAPI) {
+                document.getElementById('browserWarning').style.display = 'block';
+            }
+            if (isMobile) {
+                document.getElementById('mobileNotice').style.display = 'block';
+            }
+        })();
 
         /* ═══════════════════════════════════════════════
            Extension filter helpers
@@ -637,6 +892,46 @@ function toggleTips() {
         function setStatus(msg) {
             const bar = document.getElementById('statusBar');
             if (bar) bar.textContent = msg;
+        }
+
+
+        /* ═══════════════════════════════════════════════
+           Optional column visibility toggles
+        ═══════════════════════════════════════════════ */
+
+        const optionalColVisible = { time: true, img: true };
+
+        function toggleOptionalColumn(type) {
+            optionalColVisible[type] = !optionalColVisible[type];
+            const visible = optionalColVisible[type];
+
+            const headerId = type === 'time' ? 'timeHeader' : 'imgHeader';
+            const btnId    = type === 'time' ? 'btnToggleTime' : 'btnToggleImg';
+            const label    = type === 'time' ? '🕐 File Time' : '🖼 Image Preview';
+
+            // Toggle header
+            const th = document.getElementById(headerId);
+            if (th) th.style.display = visible ? '' : 'none';
+
+            // Toggle all body cells for that column
+            const headerRow = document.getElementById('headerRow');
+            const colIdx    = Array.from(headerRow.cells).findIndex(c => c.id === headerId);
+            if (colIdx > -1) {
+                for (let row of tableBody.rows) {
+                    if (row.cells[colIdx]) row.cells[colIdx].style.display = visible ? '' : 'none';
+                }
+            }
+
+            // Update toggle button appearance
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.classList.toggle('active', visible);
+                btn.title = visible
+                    ? `Hide the ${label} column`
+                    : `Show the ${label} column`;
+            }
+
+            setStatus(`${label} column ${visible ? 'shown' : 'hidden'}.`);
         }
 
 
@@ -929,7 +1224,7 @@ function toggleTips() {
             const id = colCounter;
             const th = document.createElement('th');
             th.dataset.colId = id;
-            th.innerHTML = `Col ${id} <button class="btn-intable btn-success" onclick="smartFillCol(${id})">⚡</button> <button class="btn-intable btn-danger" onclick="deleteColumn(${id})">✕ Col</button>`;
+            th.innerHTML = `<span class="col-header-label">Part ${id} <button class="btn-intable btn-success" onclick="smartFillCol(${id})" title="Auto-fill this part column with a smart sequence">⚡</button> <button class="btn-intable btn-danger" onclick="deleteColumn(${id})" title="Remove this part column">✕</button></span><span class="col-header-hint">type a value or use ⚡</span>`;
             document.getElementById('headerRow').insertBefore(th, document.getElementById('computedHeader'));
             for (let row of tableBody.rows) {
                 row.insertBefore(createCell(false, id, false, false, false), row.cells[row.cells.length - 1]);

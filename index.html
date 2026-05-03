@@ -400,11 +400,24 @@
         }
     </style>
     <!-- Cloudflare Zaraz safety shim: zaraz may not be injected on mobile/direct paths,
-         causing every button onclick to throw ReferenceError and silently kill the action -->
+         causing every button onclick to throw ReferenceError and silently kill the action.
+         We use a Proxy so ANY property access (track, set, ecommerce, etc.) is safe. -->
     <script>
-        if (typeof zaraz === 'undefined') {
-            window.zaraz = { track: function() {} };
-        }
+        (function() {
+            var noop = function() {};
+            var safeZaraz = typeof Proxy !== 'undefined'
+                ? new Proxy({}, { get: function() { return noop; } })
+                : { track: noop, set: noop, ecommerce: noop };
+            if (typeof window.zaraz === 'undefined') {
+                window.zaraz = safeZaraz;
+            }
+            // Re-check after DOM ready in case zaraz never loaded asynchronously
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof window.zaraz === 'undefined' || typeof window.zaraz.track !== 'function') {
+                    window.zaraz = safeZaraz;
+                }
+            });
+        })();
     </script>
 </head>
 <body>
@@ -1923,7 +1936,7 @@ function updateRowPreview(row) {
 
                 // ── Warn if folder has no matching files ──
                 if (loadedFilenames.length === 0) {
-                    const extLabel = activeExts.length > 0 ? activeExts.map(e=>'.'+e).join(', ') : 'any';
+                    const extLabel = (activeExts && activeExts.length > 0) ? activeExts.map(e=>'.'+e).join(', ') : 'any';
                     const msg = `⚠ No files matching [${extLabel}] found in "${directoryHandle.name}".\nTry changing the file extension filter or selecting a different folder.`;
                     alert(msg);
                     setStatus(`⚠ No matching files found in "${directoryHandle.name}" — adjust the extension filter and try again.`);
@@ -2005,7 +2018,6 @@ function updateRowPreview(row) {
                             await fh.move(newN);
                         }
                         // ══════════════ FOLDER CREATION UPGRADE END ══════════════
-                        await fh.move(newN);
                         renamedCount++;
                     } catch (err) {
                         errors.push(`${oldN} → ${newN}`);

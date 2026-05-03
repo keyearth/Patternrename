@@ -16,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary SEO -->
-    <title>PatternRename — Batch File Renaming Tool | Multi-Pattern, RegExp &amp; Position-Based</title>
+    <title>PatternRename — Batch File Renaming Tool | Multi-Pattern, RegExp &amp; Position-Based; Excel style</title>
 	<meta name="description" content="PatternRename is a free browser-based batch file renaming tool. Rename images, videos, documents and more using smart patterns, regular expressions, alphanumeric sequences, and character-position extraction — no installation required.">
     <meta name="keywords" content="batch file rename, bulk rename, file renaming tool, pattern rename, regex rename, image rename, browser file tool, no install rename, multi-pattern rename">
     <meta name="author" content="PatternRename">
@@ -26,7 +26,7 @@
     <!-- Open Graph (Facebook / LinkedIn) -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="PatternRename — Batch File Renaming Tool">
-    <meta property="og:description" content="Rename files in bulk right in your browser. Supports smart-fill patterns, RegExp, alphanumeric sequences and character-position extraction. Free, fast, no install.">
+    <meta property="og:description" content="Rename files in bulk right in your browser. Supports smart-fill patterns like Excel, RegExp, alphanumeric sequences and character-position extraction. Free, no file upload, no install.">
     <meta property="og:url" content="https://patternrename.app/">
     <meta property="og:locale" content="en_US">
 
@@ -121,10 +121,12 @@
         /* Small in-table buttons (Show, ⚡, X) share one class */
         .btn-intable { padding: 2px 7px; font-size: 11px; font-weight: 500; border: none; border-radius: 3px; cursor: pointer; color: white; transition: 0.2s; }
 
-        .table-wrapper { overflow: auto; border: 1px solid #ccc; max-height: 70vh; }
+        /* CLS FIX: Added min-height to reserve space before JS renders the rows */
+        .table-wrapper { overflow: auto; border: 1px solid #ccc; max-height: 70vh; min-height: 500px; }
 
         @media (max-width: 600px) {
-            .table-wrapper { max-height: 55vh; font-size: 12px; }
+            /* CLS FIX: Added min-height for mobile */
+            .table-wrapper { max-height: 55vh; min-height: 350px; font-size: 12px; }
         }
 
         table { border-collapse: collapse; width: 100%; table-layout: auto; user-select: none; }
@@ -195,7 +197,7 @@
         }
         .app-name-main {
             font-family: 'Segoe UI', sans-serif;
-            font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+            font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
             background: linear-gradient(135deg, #0C3252 0%, #00BAD2 60%, #0C3252 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text; line-height: 1.1;
@@ -436,24 +438,10 @@
 
         <!-- ── Mobile notice (shown on small screens) ── -->
         <div id="mobileNotice">
-            📱 <strong>Desktop only.</strong> File renaming requires a desktop browser (Chrome / Edge). You can explore the interface here, but renaming won't work on mobile.
+            📱 <strong>Desktop only.</strong> File renaming requires a desktop browser (Chrome / Edge). You can explore the interface here, not guaranteed to work on mobile.
         </div>
 
-        <!-- ── Welcome banner ── -->
-        <div class="welcome-banner">
-            <div class="welcome-icon">✏️</div>
-            <div class="welcome-text">
-                <h2>Batch-rename files right in your browser — no install needed</h2>
-                <p>Add name-part columns, fill or auto-generate values with ⚡ Smart Fill, then rename in one click.</p>
-                <div class="welcome-steps">
-                    <div class="step-pill">① Load folder</div>
-                    <div class="step-pill">② Add Part columns</div>
-                    <div class="step-pill">③ Fill or ⚡ Smart Fill</div>
-                    <div class="step-pill">④ Check Preview</div>
-                    <div class="step-pill">⑤ Rename All</div>
-                </div>
-            </div>
-        </div>
+
 
         <div class="toolbar">
 
@@ -525,6 +513,8 @@
             <button id="btnSmartFill"    class="btn-success" onclick="smartFillAll(); zaraz.track('button_click', { button: 'Smartfill' })">⚡ Smart Fill All</button>
             <button id="btnRenameAll"    class="btn-warning" onclick="renameAllFiles(); zaraz.track('button_click', { button: 'Rename' })">✎ Rename All Files</button>
 
+
+
             <div class="toolbar-divider"></div>
 
             <!-- ── Optional column toggles ── -->
@@ -541,6 +531,24 @@
             <button class="btn-secondary" style="margin-left:auto;"><a href="help.html" onclick="zaraz.track('button_click', { button: 'help' })" style="color:white;text-decoration:none;">? Help</a></button>
         </div>
 
+
+        <!-- ── Welcome banner ── -->
+        <div class="welcome-banner">
+            <div class="welcome-icon">✏️</div>
+            <div class="welcome-text">
+                <h2>Batch-rename files — no file upload, no install needed</h2>
+                <p>Fill seed values, then Smart Fill sequence, preview result.</p>
+                <div class="welcome-steps">
+                    <div class="step-pill">① Load folder</div>
+                    <div class="step-pill">② Fill seed values</div>
+                    <div class="step-pill">② Extend column as needed</div>
+                    <div class="step-pill">③ ⚡ Smart Fill</div>
+                    <div class="step-pill">④ Check Preview</div>
+                    <div class="step-pill">⑤ Rename All</div>
+                </div>
+            </div>
+        </div>
+		
         <div class="table-wrapper">
             <table id="dataTable">
                 <thead>
@@ -548,20 +556,17 @@
                         <th id="No" width="6">No</th>
                         <th id="firstHeader">
                             <span class="col-header-label">Original Filename</span>
-                            <span class="col-header-hint">loaded from your folder</span>
                         </th>
                         <th id="timeHeader" width="130px">
-                            <span class="col-header-label">🕐 File Time</span>
-                            <span class="col-header-hint">modified time · [gap from prev]</span>
+                            <span class="col-header-label">🕐 Timestamps</span>
                         </th>
-                        <th id="imgHeader" width="70px">🖼 Preview
+                        <th id="imgHeader" width="70px">🖼 Image
                             <button id="btnShowAll"
                                     class="btn-intable btn-success"
                                     onclick="displayAllImages()">Show all</button>
                         </th>
                         <th id="computedHeader">
                             <span class="col-header-label">✅ New Filename Preview</span>
-                            <span class="col-header-hint">all parts joined → ready to rename</span>
                         </th>
                     </tr>
                 </thead>
@@ -571,7 +576,7 @@
 
         <div id="statusBar"></div>
 
-<div id="showhint"  style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:5px 12px; background:#eef2ff; border:1px solid #c7d2fe; border-radius:6px; font-size:13px; color:#3730a3; font-weight:600; user-select:none;">
+<div id="showhint" onclick="toggleTips()" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:5px 12px; background:#eef2ff; border:1px solid #c7d2fe; border-radius:6px; font-size:13px; color:#3730a3; font-weight:600; user-select:none;">
   <span id="showhint-arrow" style="transition:transform 0.2s;">▼</span> Pattern examples &amp; tips 
 </div>
 <br>
@@ -613,21 +618,21 @@
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">A, A, C, C</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">E, E, G, G …</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">…_A, …_A, …_C</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Write the repeat block twice so Smart Fill detects it</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Can detect group patern</td>
       </tr>
       <tr>
-        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Fixed repeat</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">DOF, DOK</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">DOF, DOK …</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">…_DOF, …_DOK</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Alternates indefinitely</td>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Repeat</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">3,5,3,5</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">3,5,3,5</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">3,5,3,5</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Write pattern twice to repeat</td>
       </tr>
       <tr style="background:#f8f9fa;">
         <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Position extract</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">[5,6,7,3-1]</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;"><em>same for all rows</em></td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">PETASU</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">pos 5,6,7=<strong>PET</strong>; pos 3→1=<strong>ASU</strong></td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">pos 5,6,7=PET; pos 3→1=ASU</td>
       </tr>
       <tr>
         <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">RegExp extract</td>
@@ -648,7 +653,7 @@
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">FolderName/</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;"><em>combine with other cols</em></td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">FolderName/file.jpg</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Trailing <code>/</code> creates the subfolder and moves the file</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;"> creates the subfolder <code>/</code> and moves the file</td>
       </tr>
     </tbody>
   </table>
@@ -1235,7 +1240,7 @@ function toggleTips() {
             const id = colCounter;
             const th = document.createElement('th');
             th.dataset.colId = id;
-            th.innerHTML = `<span class="col-header-label">Part ${id} <button class="btn-intable btn-success" onclick="smartFillCol(${id})" title="Auto-fill this part column with a smart sequence">⚡</button> <button class="btn-intable btn-danger" onclick="deleteColumn(${id})" title="Remove this part column">✕</button></span><span class="col-header-hint">type a value or use ⚡</span>`;
+            th.innerHTML = `<span class="col-header-label">Part ${id} <button class="btn-intable btn-success" onclick="smartFillCol(${id})" title="Auto-fill this part column with a smart sequence">⚡</button> <button class="btn-intable btn-danger" onclick="deleteColumn(${id})" title="Remove this part column">✕</button></span>`;
             document.getElementById('headerRow').insertBefore(th, document.getElementById('computedHeader'));
             for (let row of tableBody.rows) {
                 row.insertBefore(createCell(false, id, false, false, false), row.cells[row.cells.length - 1]);
@@ -2047,7 +2052,8 @@ function updateRowPreview(row) {
            Page initialisation
         ═══════════════════════════════════════════════ */
 
-        window.onload = () => {
+        // CLS/Delay FIX: Replaced window.onload with DOMContentLoaded to build table immediately
+        document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < 20; i++) insertRowHandler();
             for (let i = 0; i < 3;  i++) addColumn();   // Three default columns
             refreshNo();
@@ -2058,7 +2064,7 @@ function updateRowPreview(row) {
 
             // Check IndexedDB for a previously used folder and update button if found
             initMainButton();
-        };
+        });
 
 
         function cleanupEmptyRows() {

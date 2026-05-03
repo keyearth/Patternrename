@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,7 +101,7 @@
         #mobileNotice strong { font-size: 14px; }
 
         .toolbar { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ddd; align-items: center; justify-content: center; }
-
+ 
         @media (max-width: 600px) {
             .toolbar { padding: 8px; gap: 6px; justify-content: flex-start; }
             .toolbar button { font-size: 12px; padding: 5px 9px; }
@@ -425,13 +424,11 @@
 
         <!-- ── Browser compatibility warning (shown if File System Access API unavailable) ── -->
         <div id="browserWarning">
-            ⚠️ <strong>Your browser doesn't fully support this app.</strong><br>
-            PatternRename uses the <strong>File System Access API</strong> to read your folder and rename files directly.
-            This requires a <strong>Chromium-based desktop browser</strong> — Safari, Firefox, and all mobile browsers do not support it yet.<br>
-            For the best experience, please open this page in:
+            ⚠️ <strong>Browser not supported.</strong>
+            PatternRename requires the File System Access API — available only in Chrome, Edge, Brave, or Opera on desktop.
             <div class="browser-links">
-                <a href="https://www.google.com/chrome/" target="_blank" rel="noopener">🟡 Google Chrome</a>
-                <a href="https://www.microsoft.com/en-us/edge" target="_blank" rel="noopener">🔵 Microsoft Edge</a>
+                <a href="https://www.google.com/chrome/" target="_blank" rel="noopener">🟡 Chrome</a>
+                <a href="https://www.microsoft.com/en-us/edge" target="_blank" rel="noopener">🔵 Edge</a>
                 <a href="https://brave.com/" target="_blank" rel="noopener">🦁 Brave</a>
                 <a href="https://www.opera.com/" target="_blank" rel="noopener">🔴 Opera</a>
             </div>
@@ -439,26 +436,21 @@
 
         <!-- ── Mobile notice (shown on small screens) ── -->
         <div id="mobileNotice">
-            📱 <strong>Tip: This tool works best on a desktop PC.</strong><br>
-            You can browse and explore the app on your phone, but to actually rename files you'll need a desktop browser (Chrome or Edge on Windows/Mac/Linux). The File System Access API used for renaming is not supported on mobile yet.
+            📱 <strong>Desktop only.</strong> File renaming requires a desktop browser (Chrome / Edge). You can explore the interface here, but renaming won't work on mobile.
         </div>
 
         <!-- ── Welcome banner ── -->
         <div class="welcome-banner">
             <div class="welcome-icon">✏️</div>
             <div class="welcome-text">
-                <h2>Rename many files at once — right in your browser</h2>
-                <p>
-                    Build a new filename by combining <strong>multiple name parts</strong> side-by-side.
-                    Each column you add becomes one piece of the final name — type a value, or let Smart Fill generate a sequence.
-                    The <em>New Filename Preview</em> column joins all parts together live so you can verify before renaming anything.
-                </p>
+                <h2>Batch-rename files right in your browser — no install needed</h2>
+                <p>Add name-part columns, fill or auto-generate values with ⚡ Smart Fill, then rename in one click.</p>
                 <div class="welcome-steps">
-                    <div class="step-pill">① Load a folder</div>
-                    <div class="step-pill">② Add Part columns <span>(name segments)</span></div>
-                    <div class="step-pill">③ Fill values or use ⚡ Smart Fill</div>
-                    <div class="step-pill">④ Check the Preview</div>
-                    <div class="step-pill">⑤ Rename All Files</div>
+                    <div class="step-pill">① Load folder</div>
+                    <div class="step-pill">② Add Part columns</div>
+                    <div class="step-pill">③ Fill or ⚡ Smart Fill</div>
+                    <div class="step-pill">④ Check Preview</div>
+                    <div class="step-pill">⑤ Rename All</div>
                 </div>
             </div>
         </div>
@@ -525,7 +517,7 @@
             </div>
 
             <!-- ── Action buttons ── -->
-            <button id="btnLoadReset"    class="btn-reset"   onclick="handleMainButton(); zaraz.track('button_click', { button: 'LoadReset' })">▶ Load &amp; Reset</button>
+            <button id="btnLoadReset"    class="btn-reset"   onclick="handleMainButton(event); zaraz.track('button_click', { button: 'LoadReset' })">▶ Load &amp; Reset</button>
             <button id="btnForgetFolder" class="btn-danger"  onclick="forgetFolder(); zaraz.track('button_click', { button: 'Changefolder' })" style="display:none;" title="Clear the saved folder so the next click picks a new one">✕ Change Folder</button>
             <button id="btnInsertRow"    class="btn-success" onclick="insertRowBtn(); zaraz.track('button_click', { button: 'Addrow' })">+ Insert Row</button>
             <button id="btnAddColumn"    class="btn-primary" onclick="addColumn(); zaraz.track('button_click', { button: 'Addcol' })" title="Add a new name-part column — values from all part columns are joined to form the final filename">+ Add Name Part</button>
@@ -586,9 +578,8 @@
 
 <div id="tips" style="margin-top:8px; overflow:hidden; max-height:1000px; transition:max-height 0.35s ease;">
 
-  <p style="font-size:13px; color:#555; margin-bottom:8px;">
-    Example filename: <strong>USA_PET_PUPPY_2026_A.jpg</strong> &nbsp;·&nbsp;
-    Positions are 1-based characters of the original filename (excluding extension).
+  <p style="font-size:12px; color:#888; margin-bottom:6px;">
+    Example: <strong>USA_PET_PUPPY_2026_A.jpg</strong> — positions are 1-based chars of the base filename (no extension).
   </p>
 
   <div style="overflow-x:auto;">
@@ -598,66 +589,66 @@
         <th style="padding:7px 10px; border:1px solid #4f46e5; text-align:left;">Feature</th>
         <th style="padding:7px 10px; border:1px solid #4f46e5;">Prefill&nbsp;(you type)</th>
         <th style="padding:7px 10px; border:1px solid #4f46e5;">Auto-fill&nbsp;(next rows)</th>
-        <th style="padding:7px 10px; border:1px solid #4f46e5;">Result in Preview</th>
+        <th style="padding:7px 10px; border:1px solid #4f46e5;">Result</th>
         <th style="padding:7px 10px; border:1px solid #4f46e5; text-align:left;">Notes</th>
       </tr>
     </thead>
     <tbody>
       <tr style="background:#f8f9fa;">
-        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Simple letter sequence</td>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Letter sequence</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">X, Y</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">Z, A, B …</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">…_X, …_Y, …_Z</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Wraps A→Z continuously</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Wraps A→Z</td>
       </tr>
       <tr>
-        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Alphanumeric with leading zero</td>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Alphanumeric</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">A3B05, A3B07</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">A3B09, A3B11 …</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">USA_A3B05.jpg …</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Numeric part increments; leading zero preserved when present</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Numeric part increments; leading zeros preserved</td>
       </tr>
       <tr style="background:#f8f9fa;">
-        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Repeating pair pattern</td>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Repeating pattern</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">A, A, C, C</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">E, E, G, G …</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">…_A, …_A, …_C, …_C</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Write the repeat block twice so Smart Fill skips ahead correctly</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">…_A, …_A, …_C</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Write the repeat block twice so Smart Fill detects it</td>
       </tr>
       <tr>
-        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Fixed-suffix repeat pattern</td>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Fixed repeat</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">DOF, DOK</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">DOF, DOK …</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">…_DOF, …_DOK</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Alternates indefinitely; tip — include the suffix (e.g. <code>5_, 6_, 7_</code>) to lock it</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Alternates indefinitely</td>
       </tr>
       <tr style="background:#f8f9fa;">
-        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Position list (char extract)</td>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Position extract</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">[5,6,7,3-1]</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;"><em>same for all rows</em></td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">PETASU</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Chars at pos 5,6,7 = <strong>PET</strong>; pos 3 down to 1 = <strong>ASU</strong> (from <em>USA_PET_PUPPY_2026_A</em>)</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">pos 5,6,7=<strong>PET</strong>; pos 3→1=<strong>ASU</strong></td>
       </tr>
       <tr>
         <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">RegExp extract</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">/\d+/</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;"><em>same for all rows</em></td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">2026</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Extracts the first run of digits — yields <strong>2026</strong> from the filename</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">First match; use <code>/(group)/</code> to capture a group</td>
       </tr>
       <tr style="background:#f8f9fa;">
-        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Pos: full name slice</td>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Full name slice</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">[1-50]</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;"><em>same for all rows</em></td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">USA_PET_PUPPY_2026_A</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Advance mode: grabs chars 1–50 of the original name (without extension)</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Chars 1–50 of base name</td>
       </tr>
       <tr>
-        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Move to new subfolder</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">USA_PET_PUPPY_2026_A/</td>
+        <td style="padding:6px 10px; border:1px solid #ddd; font-weight:600; white-space:nowrap;">Move to subfolder</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">FolderName/</td>
         <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;"><em>combine with other cols</em></td>
-        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">USA_PET_PUPPY_2026_A/<br>…renamed….jpg</td>
-        <td style="padding:6px 10px; border:1px solid #ddd;">Trailing <code>/</code> creates a subfolder named after the value and moves the file into it</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;  font-family:monospace;">FolderName/file.jpg</td>
+        <td style="padding:6px 10px; border:1px solid #ddd;">Trailing <code>/</code> creates the subfolder and moves the file</td>
       </tr>
     </tbody>
   </table>
@@ -844,7 +835,7 @@ function toggleTips() {
         }
 
         /** Single entry point for the combined button */
-        async function handleMainButton() {
+        async function handleMainButton(event) {
             const handle = await loadHandleFromDB();
             if (handle && !event.shiftKey) {
                 await reopenLastFolder();
@@ -965,9 +956,10 @@ function toggleTips() {
 
             if (nextRow) {
                 const colIndex  = currentTd.cellIndex;
-                const nextInput = nextRow.cells[colIndex].querySelector('input');
-                if (nextInput && !nextInput.readOnly) {
+                const nextInput = nextRow.cells[colIndex] && nextRow.cells[colIndex].querySelector('input');
+                if (nextInput && !nextInput.readOnly && !nextInput.disabled) {
                     nextInput.focus();
+                    nextInput.select();
                 }
             }
         }
@@ -1212,8 +1204,8 @@ function toggleTips() {
                 td.appendChild(input);
 
                 input.onfocus  = (e) => {
-                    if (!e.shiftKey) { if (!isDragging) { clearSelection(); rangeOriginTd = td; } }
-                    selectCell(e, td);
+                    if (!isShiftDown) { if (!isDragging) { clearSelection(); rangeOriginTd = td; } }
+                    selectCell({ shiftKey: isShiftDown, ctrlKey: e.ctrlKey }, td);
                 };
                 input.oninput  = ()  => updateRowPreview(td.parentElement);
                 input.onkeydown = (e) => {
@@ -1366,6 +1358,10 @@ function updateRowPreview(row) {
 
         let rangeOriginTd = null;   // anchor cell for shift-click / drag
         let isDragging    = false;
+        let isShiftDown   = false;  // tracked globally because FocusEvent does not carry shiftKey
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Shift') isShiftDown = true;  }, true);
+        document.addEventListener('keyup',   (e) => { if (e.key === 'Shift') isShiftDown = false; }, true);
 
         /** Is this td an editable smart-col cell (not filename / computed / img / No)? */
         function isSmartCell(td) {
@@ -1504,13 +1500,20 @@ function updateRowPreview(row) {
                     if (rowVals.length) lines.push(rowVals.join('\t'));
                 }
                 const clipText = lines.join('\n');
-                navigator.clipboard.writeText(clipText).catch(() => {
-                    // Fallback: silent copy via textarea trick (no browser permission prompt)
+                function fallbackCopy(text) {
                     const ta = document.createElement('textarea');
-                    ta.value = clipText; ta.style.position = 'fixed'; ta.style.opacity = '0';
-                    document.body.appendChild(ta); ta.select();
-                    document.execCommand('copy'); document.body.removeChild(ta);
-                });
+                    ta.value = text;
+                    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+                    document.body.appendChild(ta);
+                    ta.focus(); ta.select();
+                    try { document.execCommand('copy'); } catch(ex) { console.warn('Copy fallback failed', ex); }
+                    document.body.removeChild(ta);
+                }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(clipText).catch(() => fallbackCopy(clipText));
+                } else {
+                    fallbackCopy(clipText);
+                }
                 selectedCells.forEach(td => {
                     td.classList.add('copy-flash');
                     setTimeout(() => td.classList.remove('copy-flash'), 400);
@@ -1547,6 +1550,8 @@ function updateRowPreview(row) {
                         updateRowPreview(rows[targetRowIdx]);
                     }
                     setStatus(`📋 Pasted ${pastedCount} cell(s).`);
+                }).catch(() => {
+                    setStatus('⚠ Paste blocked — browser denied clipboard access. Use the browser\'s Edit menu or right-click → Paste instead.');
                 });
                 return;
             }

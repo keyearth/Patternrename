@@ -399,6 +399,13 @@
             .toolbar-group-label { font-size: 9px; }
         }
     </style>
+    <!-- Cloudflare Zaraz safety shim: zaraz may not be injected on mobile/direct paths,
+         causing every button onclick to throw ReferenceError and silently kill the action -->
+    <script>
+        if (typeof zaraz === 'undefined') {
+            window.zaraz = { track: function() {} };
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -424,7 +431,24 @@
         </div>
 
         <!-- ── Welcome banner ── -->
-        
+        <div class="welcome-banner">
+            <div class="welcome-icon">✏️</div>
+            <div class="welcome-text">
+                <h2>Rename many files at once — right in your browser</h2>
+                <p>
+                    Build a new filename by combining <strong>multiple name parts</strong> side-by-side.
+                    Each column you add becomes one piece of the final name — type a value, or let Smart Fill generate a sequence.
+                    The <em>New Filename Preview</em> column joins all parts together live so you can verify before renaming anything.
+                </p>
+                <div class="welcome-steps">
+                    <div class="step-pill">① Load a folder</div>
+                    <div class="step-pill">② Add Part columns <span>(name segments)</span></div>
+                    <div class="step-pill">③ Fill values or use ⚡ Smart Fill</div>
+                    <div class="step-pill">④ Check the Preview</div>
+                    <div class="step-pill">⑤ Rename All Files</div>
+                </div>
+            </div>
+        </div>
 
         <div class="toolbar">
 
@@ -511,25 +535,7 @@
 
             <button class="btn-secondary" style="margin-left:auto;"><a href="help.html" onclick="zaraz.track('button_click', { button: 'help' })" style="color:white;text-decoration:none;">? Help</a></button>
         </div>
-<div class="welcome-banner">
-            <div class="welcome-icon">✏️</div>
-            <div class="welcome-text">
-                <h2>Rename many files at once — right in your browser</h2>
-                <p>
-                    Build a new filename by combining <strong>multiple name parts</strong> side-by-side.
-                    type a few values to Smart Fill a sequence.
-                    The live <em>New Filename Preview</em> live so you can verify before renaming anything.
-					Rows & columns can be extended as needed.
-                </p>
-                <div class="welcome-steps"><div class="step-pill">Steps: </div>
-                    <div class="step-pill">① Load a folder</div>
-                    <div class="step-pill">② Fill pattern unit</div>
-                    <div class="step-pill">③ ⚡ Smart Fill</div>
-                    <div class="step-pill">④ Check the Preview</div>
-                    <div class="step-pill">⑤ Rename All Files</div>
-                </div>
-            </div>
-        </div>
+
         <div class="table-wrapper">
             <table id="dataTable">
                 <thead>

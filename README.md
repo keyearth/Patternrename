@@ -1,4 +1,4 @@
-# PatternRename — Batch File Renaming Tool
+# PatternRename — [Batch File Renaming Tool](https:www.patternrename.com)
 PatternRename is a high-efficiency, browser-based utility designed for precision batch renaming. Originally developed to manage time-sensitive laboratory photography, it has evolved into a versatile tool for renaming images, videos, and documents using advanced pattern recognition, Regular Expressions (RegExp), and coordinate-based character extraction.
 # Key Features
 * Zero Installation: Runs entirely in the browser using the HTML5 File System Access API. No executables or IT approvals required—perfect for restricted corporate environments.

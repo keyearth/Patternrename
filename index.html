@@ -2,18 +2,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-PNCM4ZY948"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-PNCM4ZY948');
-</script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Preconnect to third-party origins so their DNS/TLS is ready before scripts fire -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin>
+
+    <!-- Google tag: loaded after page is interactive to not block LCP -->
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-PNCM4ZY948"></script>
+    <script>
+      // Safe stub so gtag() calls before the deferred script loads don't throw
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PNCM4ZY948');
+    </script>
 
     <!-- Primary SEO -->
     <title>PatternRename — Batch File Renaming Tool | Multi-Pattern, RegExp &amp; Position-Based; Excel style</title>
@@ -122,7 +126,7 @@
         .btn-intable { padding: 2px 7px; font-size: 11px; font-weight: 500; border: none; border-radius: 3px; cursor: pointer; color: white; transition: 0.2s; }
 
         /* CLS FIX: Added min-height to reserve space before JS renders the rows */
-        .table-wrapper { overflow: auto; border: 1px solid #ccc; max-height: 70vh; min-height: 500px; }
+        .table-wrapper { overflow: auto; border: 1px solid #ccc; max-height: 70vh; min-height: 500px; contain: strict; }
 
         @media (max-width: 600px) {
             /* CLS FIX: Added min-height for mobile */
@@ -317,7 +321,7 @@
 
         /* ── Welcome banner ── */
         .welcome-banner {
-            background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);
+            background: #eef2ff;           /* solid fallback — no gradient cost on first paint */
             border: 1px solid #c7d2fe;
             border-radius: 8px;
             padding: 14px 18px;
@@ -325,6 +329,11 @@
             display: flex;
             align-items: flex-start;
             gap: 14px;
+            contain: layout style;         /* isolate subtree layout/style from the rest of page */
+        }
+        /* Applied via JS after page load so gradient never blocks LCP */
+        .welcome-banner.loaded {
+            background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);
         }
         @media (max-width: 600px) {
             .welcome-banner { padding: 10px 12px; gap: 10px; flex-wrap: wrap; }
@@ -533,10 +542,10 @@
 
 
         <!-- ── Welcome banner ── -->
-        <div class="welcome-banner">
-            <div class="welcome-icon">✏️</div>
+        <div class="welcome-banner" id="welcomeBanner">
+            <div class="welcome-icon" aria-hidden="true">✏️</div>
             <div class="welcome-text">
-                <h2>Batch-rename files — no file upload, no install needed</h2>
+                <h2 elementtiming="lcp-heading">Batch-rename files — no file upload, no install needed</h2>
                 <p>Fill seed values, then Smart Fill sequence, preview result.</p>
                 <div class="welcome-steps">
                     <div class="step-pill">① Load folder</div>
@@ -1656,11 +1665,15 @@ function updateRowPreview(row) {
             const patternData = detectPattern(filled.map(f => f.val));
 
             for (let i = lastFilled.idx + 1; i < rows.length; i++) {
-                 const originalFileInp = rows[i].cells[1].querySelector('input');
-                if (!originalFileInp || originalFileInp.value.trim() === "") {
-                    continue; 
+                // Skip rows only when a folder IS loaded AND this row has no matching file.
+                // When no folder is loaded (manual mode), fill all rows freely.
+                if (directoryHandle) {
+                    const originalFileInp = rows[i].cells[1].querySelector('input');
+                    if (!originalFileInp || originalFileInp.value.trim() === "") {
+                        continue;
+                    }
                 }
- 
+
                 const input = rows[i].cells[colIdx].querySelector('input');
 
                 if (patternData.type === 'alphanumeric') {
@@ -1741,9 +1754,15 @@ function updateRowPreview(row) {
     }
     // ══════════════ NEW FEATURE END ══════════════
 
-            // 1. Alphanumeric
+            // 1. Alphanumeric (e.g. IMG001, IMG002 — text prefix + numeric suffix)
+            // Skip pure integers AND pure negative numbers here so they fall through to
+            // arithmetic_num, which handles zero and negatives correctly (e.g. 3,2,1 → 0,-1,-2).
             const alphanumericMatches = values.map(v => v.match(/^(\D*(?:\d*\D+)*)(\d+)$/));
-            if (alphanumericMatches.every(m => m !== null && m[1] !== undefined && m[2] !== undefined)) {
+            const isPureNumber = v => /^-?\d+(\.\d+)?$/.test(v.trim());
+            const hasMeaningfulPrefix = alphanumericMatches.every(m => m !== null && m[1] !== undefined && m[2] !== undefined)
+                                        && alphanumericMatches.some(m => m[1] !== '')
+                                        && !values.every(isPureNumber);
+            if (hasMeaningfulPrefix) {
                 const numParts       = alphanumericMatches.map(m => parseInt(m[2], 10));
                 const textParts      = alphanumericMatches.map(m => m[1]);
                 const numStep        = numParts[1] - numParts[0];
@@ -1951,7 +1970,6 @@ function updateRowPreview(row) {
                     alert(msg);
                     setStatus(`⚠ No matching files found in "${directoryHandle.name}" — adjust the extension filter and try again.`);
                     directoryHandle = null;
-                    setControlsEnabled(false);
                     return;
                 }
 
@@ -1980,7 +1998,14 @@ function updateRowPreview(row) {
         ═══════════════════════════════════════════════ */
 
         async function renameAllFiles() {
-            if (!directoryHandle) return alert("Select folder first.");
+            if (!directoryHandle) {
+                return alert("⚠ No folder loaded.\n\nPlease click 'Load & Reset' to open a folder before renaming files.");
+            }
+
+            // Check that at least one filename has been loaded
+            if (!loadedFilenames || loadedFilenames.length === 0) {
+                return alert("⚠ No files loaded.\n\nThe folder appears to be empty or no files match the current filter.\nPlease load a folder that contains files first.");
+            }
 
             // Validate all columns before renaming
             const err = validateColumnFill(null);
@@ -2058,9 +2083,13 @@ function updateRowPreview(row) {
             for (let i = 0; i < 3;  i++) addColumn();   // Three default columns
             refreshNo();
 
-            // Disable everything except Load & Reset until a folder is opened
-            setControlsEnabled(false);
-            setStatus('Ready — click Load & Reset to open a folder, or use Reopen if shown.');
+            setStatus('Ready — click Load &amp; Reset to open a folder, or use Reopen if shown.');
+
+            // Apply the decorative gradient AFTER first paint so it never delays LCP
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                const banner = document.getElementById('welcomeBanner');
+                if (banner) banner.classList.add('loaded');
+            }));
 
             // Check IndexedDB for a previously used folder and update button if found
             initMainButton();
